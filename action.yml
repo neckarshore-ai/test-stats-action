@@ -1,0 +1,60 @@
+name: 'Emit test stats'
+description: "Map a test runner's native reporter output to the estate stats.json contract (runner-reported, never grep)."
+author: 'Neckarshore AI'
+
+# The transform is centralized HERE; the test-run stays per-repo. Each repo runs its own
+# suites in its own CI, then calls this action with two facts — which runner, where the
+# reporter output is — and the action emits the contract-conformant stats.json.
+# Contract: https://github.com/neckarshore-ai/neckarshore-planning/blob/main/docs/reference/stats-json-contract.md
+
+inputs:
+  repo:
+    description: 'owner/name — the canonical GitHub slug for this repo.'
+    required: true
+    default: ${{ github.repository }}
+  out:
+    description: 'Target path to write the stats.json (the repo statsPath).'
+    required: true
+    default: 'stats.json'
+  runners:
+    description: >
+      One line per distinct runner total, mapped into tests.byType (additive).
+      Format: "type:runner:reporterpath" where runner is one of
+      jest | vitest | playwright | pytest | bats | python-direct.
+      Multiple lines of the same type are merge-added into one byType entry.
+    required: true
+  lenses:
+    description: >
+      Optional. One line per overlapping classification subset, mapped into tests.lenses
+      (display-only, NEVER summed into total/byType). Same "type:runner:reporterpath" format.
+    required: false
+    default: ''
+  endpoints:
+    description: 'Optional API endpoint count carried for the tile facet. Omitted from output when empty.'
+    required: false
+    default: ''
+  sha:
+    description: 'Optional audited_sha override. Defaults to `git rev-parse HEAD` in the checked-out repo.'
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    # Composite run steps do NOT auto-populate INPUT_* env (unlike JS/Docker actions),
+    # so map every input explicitly. The repo must run actions/checkout BEFORE this step
+    # (the default audited_sha = git rev-parse HEAD needs the checkout).
+    - name: Emit stats.json
+      shell: bash
+      run: ${{ github.action_path }}/emit-test-stats.sh
+      env:
+        INPUT_REPO: ${{ inputs.repo }}
+        INPUT_OUT: ${{ inputs.out }}
+        INPUT_RUNNERS: ${{ inputs.runners }}
+        INPUT_LENSES: ${{ inputs.lenses }}
+        INPUT_ENDPOINTS: ${{ inputs.endpoints }}
+        INPUT_SHA: ${{ inputs.sha }}
+
+branding:
+  icon: 'check-circle'
+  color: 'green'

@@ -1,0 +1,199 @@
+Listing tests:
+  [chromium] › accessibility.spec.ts:15:9 › Accessibility › TC-A11Y-001: / has exactly one H1
+  [chromium] › accessibility.spec.ts:20:9 › Accessibility › TC-A11Y-002: / has no heading level skips
+  [chromium] › accessibility.spec.ts:34:9 › Accessibility › TC-A11Y-003: / has lang attribute on html
+  [chromium] › accessibility.spec.ts:39:9 › Accessibility › TC-A11Y-004: / — all images have alt text
+  [chromium] › accessibility.spec.ts:48:9 › Accessibility › TC-A11Y-005: / — nav buttons have accessible names
+  [chromium] › accessibility.spec.ts:15:9 › Accessibility › TC-A11Y-006: /impressum has exactly one H1
+  [chromium] › accessibility.spec.ts:20:9 › Accessibility › TC-A11Y-007: /impressum has no heading level skips
+  [chromium] › accessibility.spec.ts:34:9 › Accessibility › TC-A11Y-008: /impressum has lang attribute on html
+  [chromium] › accessibility.spec.ts:39:9 › Accessibility › TC-A11Y-009: /impressum — all images have alt text
+  [chromium] › accessibility.spec.ts:48:9 › Accessibility › TC-A11Y-010: /impressum — nav buttons have accessible names
+  [chromium] › accessibility.spec.ts:15:9 › Accessibility › TC-A11Y-011: /datenschutz has exactly one H1
+  [chromium] › accessibility.spec.ts:20:9 › Accessibility › TC-A11Y-012: /datenschutz has no heading level skips
+  [chromium] › accessibility.spec.ts:34:9 › Accessibility › TC-A11Y-013: /datenschutz has lang attribute on html
+  [chromium] › accessibility.spec.ts:39:9 › Accessibility › TC-A11Y-014: /datenschutz — all images have alt text
+  [chromium] › accessibility.spec.ts:48:9 › Accessibility › TC-A11Y-015: /datenschutz — nav buttons have accessible names
+  [chromium] › api-track-auth.spec.ts:10:7 › TC-STAT-009 — /api/track GET auth › TC-STAT-009-1: GET without Authorization header returns 401
+  [chromium] › api-track-auth.spec.ts:15:7 › TC-STAT-009 — /api/track GET auth › TC-STAT-009-2: GET with malformed Authorization header returns 401
+  [chromium] › api-track-auth.spec.ts:22:7 › TC-STAT-009 — /api/track GET auth › TC-STAT-009-3: GET with non-Bearer scheme returns 401
+  [chromium] › api-track-auth.spec.ts:29:7 › TC-STAT-009 — /api/track GET auth › TC-STAT-009-4: GET with correct Bearer token returns 200 with expected shape
+  [chromium] › api-track-auth.spec.ts:45:7 › TC-STAT-009 — /api/track GET auth › TC-STAT-009-5: Authenticated 200 response has Cache-Control: private, no-store
+  [chromium] › api-track-auth.spec.ts:58:7 › TC-STAT-009 — /api/track GET auth › TC-STAT-009-6: POST without Authorization header still returns 200 (visitor-ping unaffected)
+  [chromium] › calendly.spec.ts:5:7 › Calendly CTAs › TC-CAL-001: all Calendly links point to correct URL and open externally
+  [chromium] › calendly.spec.ts:16:7 › Calendly CTAs › TC-CAL-002: nav CTA button links to Calendly on all pages
+  [chromium] › calendly.spec.ts:27:7 › Calendly CTAs › TC-CAL-003: Calendly URL is reachable
+  [chromium] › content-surface.spec.ts:42:7 › Content surface — Glossar › TC-CNT-001: glossar index lists every entry and links to it
+  [chromium] › content-surface.spec.ts:56:11 › Content surface — Glossar › entry: bestaetigungsfehler › TC-CNT-002 [bestaetigungsfehler]: 200, single H1 = term
+  [chromium] › content-surface.spec.ts:63:11 › Content surface — Glossar › entry: bestaetigungsfehler › TC-CNT-003 [bestaetigungsfehler]: definition is the first content paragraph
+  [chromium] › content-surface.spec.ts:70:11 › Content surface — Glossar › entry: bestaetigungsfehler › TC-CNT-004 [bestaetigungsfehler]: valid DefinedTerm JSON-LD
+  [chromium] › content-surface.spec.ts:79:11 › Content surface — Glossar › entry: bestaetigungsfehler › TC-CNT-005 [bestaetigungsfehler]: links back to /products/clearpath
+  [chromium] › content-surface.spec.ts:86:11 › Content surface — Glossar › entry: bestaetigungsfehler › TC-CNT-006 [bestaetigungsfehler]: body is a citable unit (<= 160 words)
+  [chromium] › content-surface.spec.ts:94:11 › Content surface — Glossar › entry: bestaetigungsfehler › TC-CNT-007 [bestaetigungsfehler]: carries the "Wie dieser Text entstand" note
+  [chromium] › content-surface.spec.ts:56:11 › Content surface — Glossar › entry: ueberlebenden-verzerrung › TC-CNT-002 [ueberlebenden-verzerrung]: 200, single H1 = term
+  [chromium] › content-surface.spec.ts:63:11 › Content surface — Glossar › entry: ueberlebenden-verzerrung › TC-CNT-003 [ueberlebenden-verzerrung]: definition is the first content paragraph
+  [chromium] › content-surface.spec.ts:70:11 › Content surface — Glossar › entry: ueberlebenden-verzerrung › TC-CNT-004 [ueberlebenden-verzerrung]: valid DefinedTerm JSON-LD
+  [chromium] › content-surface.spec.ts:79:11 › Content surface — Glossar › entry: ueberlebenden-verzerrung › TC-CNT-005 [ueberlebenden-verzerrung]: links back to /products/clearpath
+  [chromium] › content-surface.spec.ts:86:11 › Content surface — Glossar › entry: ueberlebenden-verzerrung › TC-CNT-006 [ueberlebenden-verzerrung]: body is a citable unit (<= 160 words)
+  [chromium] › content-surface.spec.ts:94:11 › Content surface — Glossar › entry: ueberlebenden-verzerrung › TC-CNT-007 [ueberlebenden-verzerrung]: carries the "Wie dieser Text entstand" note
+  [chromium] › content-surface.spec.ts:56:11 › Content surface — Glossar › entry: versunkene-kosten-falle › TC-CNT-002 [versunkene-kosten-falle]: 200, single H1 = term
+  [chromium] › content-surface.spec.ts:63:11 › Content surface — Glossar › entry: versunkene-kosten-falle › TC-CNT-003 [versunkene-kosten-falle]: definition is the first content paragraph
+  [chromium] › content-surface.spec.ts:70:11 › Content surface — Glossar › entry: versunkene-kosten-falle › TC-CNT-004 [versunkene-kosten-falle]: valid DefinedTerm JSON-LD
+  [chromium] › content-surface.spec.ts:79:11 › Content surface — Glossar › entry: versunkene-kosten-falle › TC-CNT-005 [versunkene-kosten-falle]: links back to /products/clearpath
+  [chromium] › content-surface.spec.ts:86:11 › Content surface — Glossar › entry: versunkene-kosten-falle › TC-CNT-006 [versunkene-kosten-falle]: body is a citable unit (<= 160 words)
+  [chromium] › content-surface.spec.ts:94:11 › Content surface — Glossar › entry: versunkene-kosten-falle › TC-CNT-007 [versunkene-kosten-falle]: carries the "Wie dieser Text entstand" note
+  [chromium] › content-surface.spec.ts:105:7 › Content surface — Products index › TC-CNT-010: /products renders 200 with the four category headings
+  [chromium] › content-surface.spec.ts:116:7 › Content surface — Products index › TC-CNT-011: ClearPath card links to /products/clearpath
+  [chromium] › content-surface.spec.ts:121:7 › Content surface — Products index › TC-CNT-013: Omnopsis card links to /products/omnopsis
+  [chromium] › content-surface.spec.ts:128:7 › Content surface — Products index › TC-CNT-014: portal shows only featured MMPs + a 'mehr' tile, dropped MMPs absent
+  [chromium] › content-surface.spec.ts:147:7 › Content surface — Products index › TC-CNT-015: the MMP sub-portal lists the FULL category (featured + dropped)
+  [chromium] › content-surface.spec.ts:162:7 › Content surface — Products index › TC-CNT-012: no empty or placeholder internal links
+  [chromium] › content-surface.spec.ts:176:7 › Content surface — Products index › TC-CNT-016: website cards are labelled 'Website', not 'Extern'
+  [chromium] › content-surface.spec.ts:184:7 › Content surface — ClearPath product › TC-CNT-020: 200, single H1, definition lead is the first paragraph
+  [chromium] › content-surface.spec.ts:196:7 › Content surface — ClearPath product › TC-CNT-021: live-app link present and rel-correct
+  [chromium] › content-surface.spec.ts:204:7 › Content surface — ClearPath product › TC-CNT-022: links to all three related glossary entries
+  [chromium] › content-surface.spec.ts:215:7 › Content surface — ClearPath product › TC-CNT-023: emits exactly one SoftwareApplication JSON-LD block
+  [chromium] › content-surface.spec.ts:225:7 › Content surface — ClearPath product › TC-CNT-024: carries the "Wie dieser Text entstand" note
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/glossar]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/glossar]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/glossar/bestaetigungsfehler]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/glossar/bestaetigungsfehler]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/glossar/ueberlebenden-verzerrung]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/glossar/ueberlebenden-verzerrung]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/glossar/versunkene-kosten-falle]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/glossar/versunkene-kosten-falle]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/clearpath]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/clearpath]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/omnopsis]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/omnopsis]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/flagships]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/flagships]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/mmps]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/mmps]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/skills]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/skills]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/websites]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/websites]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/snakeoil-check]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/snakeoil-check]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/local-seo-hub]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/local-seo-hub]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/phonesis]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/phonesis]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/prod-or-pretend]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/prod-or-pretend]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/obsidian-vault-autopilot]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/obsidian-vault-autopilot]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/ai-phrase-check]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/ai-phrase-check]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/imap-mailbox-cleanup]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/imap-mailbox-cleanup]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:310:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-030 [/products/social-scrapers]: unique title, single H1, canonical, JSON-LD
+  [chromium] › content-surface.spec.ts:331:9 › Content surface — SEO/GEO dual-axis sweep › TC-CNT-031 [/products/social-scrapers]: lang=de, no heading skips, no overflow @393px
+  [chromium] › content-surface.spec.ts:356:7 › Skills on-page overview table @content › TC-CNT-032: /products/skills renders an overview table with one row per skill
+  [chromium] › content-surface.spec.ts:366:7 › Skills on-page overview table @content › TC-CNT-033: every overview-table link resolves — in-page anchor → its card, detail link → a product route
+  [chromium] › content-surface.spec.ts:391:7 › Skills on-page overview table @content › TC-CNT-034: clicking a bookmark scrolls the matching card near the top
+  [chromium] › content-surface.spec.ts:414:7 › Content surface — Snakeoil-Check preview MMP › TC-CNT-035: 200, single H1 contains the name, citable definition is the lead paragraph
+  [chromium] › content-surface.spec.ts:426:7 › Content surface — Snakeoil-Check preview MMP › TC-CNT-036: renders the five MMP content axes as headings
+  [chromium] › content-surface.spec.ts:439:7 › Content surface — Snakeoil-Check preview MMP › TC-CNT-037: one preview SoftwareApplication block — no url, no offers (AD-19 fail-closed)
+  [chromium] › content-surface.spec.ts:454:7 › Content surface — Phonesis Voicebank preview MMP › TC-CNT-038: 200, single H1 contains the name, citable definition is the lead paragraph
+  [chromium] › content-surface.spec.ts:466:7 › Content surface — Phonesis Voicebank preview MMP › TC-CNT-039: renders the six MMP content axes as headings
+  [chromium] › content-surface.spec.ts:480:7 › Content surface — Phonesis Voicebank preview MMP › TC-CNT-040: one preview SoftwareApplication block — no url, no offers (AD-19 fail-closed)
+  [chromium] › content-surface.spec.ts:495:7 › Content surface — Prod-or-Pretend preview MMP › TC-CNT-041: 200, single H1 contains the name, citable definition is the lead paragraph
+  [chromium] › content-surface.spec.ts:507:7 › Content surface — Prod-or-Pretend preview MMP › TC-CNT-042: renders the five MMP content axes as headings
+  [chromium] › content-surface.spec.ts:520:7 › Content surface — Prod-or-Pretend preview MMP › TC-CNT-043: one preview SoftwareApplication block — no url, no offers (AD-19 fail-closed)
+  [chromium] › content-surface.spec.ts:535:7 › Content surface — Local-SEO-Hub preview MMP › TC-CNT-044: 200, single H1 contains the name, citable definition is the lead paragraph
+  [chromium] › content-surface.spec.ts:547:7 › Content surface — Local-SEO-Hub preview MMP › TC-CNT-045: renders the five MMP content axes as headings
+  [chromium] › content-surface.spec.ts:560:7 › Content surface — Local-SEO-Hub preview MMP › TC-CNT-046: one preview SoftwareApplication block — no url, no offers (AD-19 fail-closed)
+  [chromium] › content-surface.spec.ts:575:7 › Content surface — AI Phrase Check skill detail › TC-CNT-047: 200, single H1 contains the name, citable lead paragraph
+  [chromium] › content-surface.spec.ts:587:7 › Content surface — AI Phrase Check skill detail › TC-CNT-048: renders the skill detail sections as headings
+  [chromium] › content-surface.spec.ts:601:7 › Content surface — AI Phrase Check skill detail › TC-CNT-049: SoftwareApplication (real url + free Offer) + FAQPage JSON-LD — indexable skill posture
+  [chromium] › links.spec.ts:15:9 › Links › TC-LNK-001: all links on / are valid (no 404)
+  [chromium] › links.spec.ts:35:9 › Links › TC-LNK-002: external links on / open in new tab
+  [chromium] › links.spec.ts:49:9 › Links › TC-LNK-003: external links on / are reachable
+  [chromium] › links.spec.ts:15:9 › Links › TC-LNK-004: all links on /impressum are valid (no 404)
+  [chromium] › links.spec.ts:35:9 › Links › TC-LNK-005: external links on /impressum open in new tab
+  [chromium] › links.spec.ts:49:9 › Links › TC-LNK-006: external links on /impressum are reachable
+  [chromium] › links.spec.ts:15:9 › Links › TC-LNK-007: all links on /datenschutz are valid (no 404)
+  [chromium] › links.spec.ts:35:9 › Links › TC-LNK-008: external links on /datenschutz open in new tab
+  [chromium] › links.spec.ts:49:9 › Links › TC-LNK-009: external links on /datenschutz are reachable
+  [chromium] › navigation.spec.ts:5:7 › Navigation › TC-NAV-001: homepage loads with visible H1
+  [chromium] › navigation.spec.ts:17:9 › Navigation › TC-NAV-002: homepage nav link scrolls to #services
+  [chromium] › navigation.spec.ts:17:9 › Navigation › TC-NAV-003: homepage nav link scrolls to #why-nearshore
+  [chromium] › navigation.spec.ts:17:9 › Navigation › TC-NAV-005: homepage nav link scrolls to #founder
+  [chromium] › navigation.spec.ts:27:7 › Navigation › TC-NAV-004: Produkte dropdown reveals the category sub-portal links on hover
+  [chromium] › navigation.spec.ts:41:7 › Navigation › TC-NAV-006: nav link from /impressum navigates to homepage #services
+  [chromium] › navigation.spec.ts:48:7 › Navigation › TC-NAV-007: nav link from /datenschutz navigates to homepage #services
+  [chromium] › navigation.spec.ts:55:7 › Navigation › TC-NAV-008: footer links work
+  [chromium] › navigation.spec.ts:63:7 › Navigation › TC-NAV-009: logo links to homepage from subpages
+  [chromium] › navigation.spec.ts:69:7 › Navigation › TC-NAV-010: mobile menu opens and closes
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-001: / has no horizontal overflow on iPhone 15 Pro (393px)
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-002: /impressum has no horizontal overflow on iPhone 15 Pro (393px)
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-003: /datenschutz has no horizontal overflow on iPhone 15 Pro (393px)
+  [chromium] › responsive.spec.ts:27:9 › Responsive › TC-RES-004: nav is usable on iPhone 15 Pro (393px)
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-005: / has no horizontal overflow on iPhone 14 Plus (414px)
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-006: /impressum has no horizontal overflow on iPhone 14 Plus (414px)
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-007: /datenschutz has no horizontal overflow on iPhone 14 Plus (414px)
+  [chromium] › responsive.spec.ts:27:9 › Responsive › TC-RES-008: nav is usable on iPhone 14 Plus (414px)
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-009: / has no horizontal overflow on iPad Mini (768px)
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-010: /impressum has no horizontal overflow on iPad Mini (768px)
+  [chromium] › responsive.spec.ts:17:11 › Responsive › TC-RES-011: /datenschutz has no horizontal overflow on iPad Mini (768px)
+  [chromium] › responsive.spec.ts:27:9 › Responsive › TC-RES-012: nav is usable on iPad Mini (768px)
+  [chromium] › search.spec.ts:29:7 › Cmd+K Search @search › TC-SRCH-001: Cmd+K opens, finds a glossar entry, Enter deep-links to /glossar
+  [chromium] › search.spec.ts:37:7 › Cmd+K Search @search › TC-SRCH-002: Ctrl+K opens, Escape closes
+  [chromium] › search.spec.ts:43:7 › Cmd+K Search @search › TC-SRCH-003: header search button opens the overlay (mobile)
+  [chromium] › search.spec.ts:51:7 › Cmd+K Search @search › TC-SRCH-004: finds a preview product by name, Enter navigates to its page
+  [chromium] › search.spec.ts:59:7 › Cmd+K Search @search › TC-SRCH-005: ArrowDown + Enter navigates to the second result
+  [chromium] › search.spec.ts:68:7 › Cmd+K Search @search › TC-SRCH-006: no console errors opening + searching
+  [chromium] › search.spec.ts:79:7 › Cmd+K Search @search › TC-SRCH-007: external site result opens in a new tab @external
+  [chromium] › seo.spec.ts:12:9 › SEO Basics › TC-SEO-001: / has meta title containing "neckarshore.ai"
+  [chromium] › seo.spec.ts:12:9 › SEO Basics › TC-SEO-002: /impressum has meta title containing "Impressum"
+  [chromium] › seo.spec.ts:12:9 › SEO Basics › TC-SEO-003: /datenschutz has meta title containing "Datenschutz"
+  [chromium] › seo.spec.ts:25:9 › SEO Basics › TC-SEO-004: / has meta description
+  [chromium] › seo.spec.ts:25:9 › SEO Basics › TC-SEO-005: /impressum has meta description
+  [chromium] › seo.spec.ts:25:9 › SEO Basics › TC-SEO-006: /datenschutz has meta description
+  [chromium] › seo.spec.ts:31:7 › SEO Basics › TC-SEO-007: homepage has JSON-LD structured data
+  [chromium] › seo.spec.ts:39:7 › SEO Basics › TC-SEO-008: robots.txt is accessible
+  [chromium] › seo.spec.ts:45:7 › SEO Basics › TC-SEO-009: sitemap.xml is accessible
+  [chromium] › seo.spec.ts:51:7 › SEO Basics › TC-SEO-010: homepage has og:image meta tag
+  [chromium] › seo.spec.ts:57:7 › SEO Basics › TC-SEO-011: og:image dimensions are 1200x630
+  [chromium] › seo.spec.ts:69:7 › SEO Basics › TC-SEO-012: twitter card is summary_large_image
+  [chromium] › seo.spec.ts:89:9 › SEO Basics › TC-SEO-015: / og:description is at least 110 characters
+  [chromium] › seo.spec.ts:89:9 › SEO Basics › TC-SEO-016: /impressum og:description is at least 110 characters
+  [chromium] › seo.spec.ts:89:9 › SEO Basics › TC-SEO-017: /datenschutz og:description is at least 110 characters
+  [chromium] › seo.spec.ts:107:9 › SEO Basics › TC-SEO-018: / has correct canonical URL
+  [chromium] › seo.spec.ts:107:9 › SEO Basics › TC-SEO-019: /impressum has correct canonical URL
+  [chromium] › seo.spec.ts:107:9 › SEO Basics › TC-SEO-020: /datenschutz has correct canonical URL
+  [chromium] › seo.spec.ts:131:9 › SEO Basics › TC-SEO-013: /impressum has page-specific og:title and og:url
+  [chromium] › seo.spec.ts:131:9 › SEO Basics › TC-SEO-014: /datenschutz has page-specific og:title and og:url
+  [chromium] › smoke.spec.ts:9:7 › Smoke @smoke › TC-SMK-001: homepage loads with visible H1
+  [chromium] › smoke.spec.ts:15:7 › Smoke @smoke › TC-SMK-002: key sections present on homepage
+  [chromium] › smoke.spec.ts:22:7 › Smoke @smoke › TC-SMK-003: all pages return 200
+  [chromium] › smoke.spec.ts:29:7 › Smoke @smoke › TC-SMK-004: tracking endpoint is reachable
+  [chromium] › smoke.spec.ts:38:7 › Smoke @smoke › TC-SMK-005: no console errors on homepage
+  [chromium] › stats.spec.ts:18:7 › Stats Tiles @smoke › TC-STAT-001: Days since First Commit is plausible
+  [chromium] › stats.spec.ts:26:7 › Stats Tiles @smoke › TC-STAT-002: Commits count is plausible
+  [chromium] › stats.spec.ts:34:7 › Stats Tiles @smoke › TC-STAT-003: Zeilen Code is plausible
+  [chromium] › stats.spec.ts:41:7 › Stats Tiles @smoke › TC-STAT-004: Repositories count is plausible
+  [chromium] › stats.spec.ts:53:7 › Stats Tiles @smoke › TC-STAT-005: Tests count is plausible
+  [chromium] › stats.spec.ts:60:7 › Stats Tiles @smoke › TC-STAT-006: Endpoints count is plausible
+  [chromium] › stats.spec.ts:67:7 › Stats Tiles @smoke › TC-STAT-007: No tile shows zero or dash
+  [chromium] › stats.spec.ts:79:7 › Stats Tiles @smoke › TC-STAT-009: Tests tile reflects testScope.total + byType breakdown
+  [chromium] › stats.spec.ts:109:7 › Stats Tiles @smoke › TC-STAT-008: No API call to /api/github-stats
+  [chromium] › theme.spec.ts:42:7 › Theme / Dark Mode › TC-THM-001: theme toggle switches between light and dark
+  [chromium] › theme.spec.ts:59:7 › Theme / Dark Mode › TC-THM-002: accent text has WCAG AA contrast on light background
+  [chromium] › theme.spec.ts:70:7 › Theme / Dark Mode › TC-THM-003: headings have WCAG AA contrast on each page in light mode
+  [chromium] › web-vitals.spec.ts:17:7 › TC-WV pure lib — rating thresholds (Google CWV) › TC-WV-001: ratingFor classifies LCP good/needs-improvement/poor at the boundaries
+  [chromium] › web-vitals.spec.ts:26:7 › TC-WV pure lib — rating thresholds (Google CWV) › TC-WV-002: ratingFor uses metric-specific thresholds (CLS is unitless)
+  [chromium] › web-vitals.spec.ts:38:7 › TC-WV pure lib — percentile (nearest-rank) › TC-WV-003: percentile picks the nearest-rank value, deterministic
+  [chromium] › web-vitals.spec.ts:48:7 › TC-WV pure lib — name guard › TC-WV-004: isWebVitalName accepts the 5 standard metrics, rejects others
+  [chromium] › web-vitals.spec.ts:62:7 › TC-WV pure lib — summarizeWebVitals (p75 per metric) › TC-WV-005: groups by metric and reports p75 + count + rating
+  [chromium] › web-vitals.spec.ts:84:7 › TC-WV pure lib — summarizeWebVitals (p75 per metric) › TC-WV-006: ignores unknown metrics and non-numeric values
+  [chromium] › web-vitals.spec.ts:98:7 › TC-WV pure lib — summarizeWebVitals (p75 per metric) › TC-WV-007: rounds ms metrics to integers, CLS to 3 decimals
+  [chromium] › web-vitals.spec.ts:114:7 › TC-WV HTTP — /api/track web_vital ingestion › TC-WV-010: POST a web_vital event returns 200 (event accepted)
+  [chromium] › web-vitals.spec.ts:130:7 › TC-WV HTTP — /api/track web_vital ingestion › TC-WV-011: POST with an invalid metric name is rejected (400)
+  [chromium] › web-vitals.spec.ts:137:7 › TC-WV HTTP — /api/track web_vital ingestion › TC-WV-012: authenticated GET surfaces a webVitals p75 summary
+  [chromium] › web-vitals.spec.ts:167:7 › TC-WV browser — TrackerScript emits web_vital beacons › TC-WV-020: loading the homepage sends at least one valid web_vital beacon
+Total: 197 tests in 13 files
