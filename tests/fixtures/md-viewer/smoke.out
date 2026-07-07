@@ -1,0 +1,15 @@
+==> md-viewer smoke test
+  ok   - build produced viewer.html
+  ok   - template has MD placeholder
+  ok   - template has filename placeholder
+  ok   - marked inlined
+  ok   - highlight.js inlined
+  ok   - DOMPurify inlined
+  ok   - github-markdown css inlined
+  ok   - mdview generated /var/folders/0f/71v60w053z54700n03r6dkdh0000gn/T//mdview.TlDNye/fixture.md.html
+  ok   - all placeholders resolved
+  ok   - MD payload embedded
+  ok   - mdview rejects missing file
+  ok   - frontmatter parser unit test
+  ok   - frontmatter splitter inlined
+==> SMOKE TEST PASSED

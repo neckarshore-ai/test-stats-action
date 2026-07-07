@@ -1,0 +1,36 @@
+==> md-viewer web smoke test
+  ok   - web/index.html built
+  ok   - 4 theme×mode token blocks
+  ok   - theme present: minimalist
+  ok   - theme present: swiss
+  ok   - brutalist removed
+  ok   - no-FOUC init present
+  ok   - meta description
+  ok   - canonical link
+  ok   - Open Graph tags
+  ok   - JSON-LD schema
+  ok   - descriptive web title
+  ok   - robots.txt present
+  ok   - sitemap.xml present
+  ok   - how-it-works page present
+  ok   - how-it-works nav link
+  ok   - README payload embedded
+  ok   - README placeholder resolved
+  ok   - 5 font files referenced
+  ok   - 5 font files present
+  ok   - theme dropdown present
+  ok   - theme-scoped chrome inlined
+  ok   - grid rail markup present
+  ok   - raw font bumped to 14px
+  ok   - marked inlined
+  ok   - DOMPurify inlined
+  ok   - hljs inlined
+  ok   - frontmatter splitter inlined
+  ok   - changelog button present
+  ok   - footer version resolved
+  ok   - footer SHA resolved
+  ok   - changelog placeholders resolved
+  ok   - properties panel styled
+==> delegating to Finder smoke test
+  ok   - Finder smoke test passes
+==> WEB SMOKE TEST PASSED

@@ -18,15 +18,43 @@ inputs:
     default: 'stats.json'
   runners:
     description: >
-      One line per distinct runner total, mapped into tests.byType (additive).
+      One line per distinct runner total, mapped into tests.byType (additive) and summed
+      into tests.total. total = only counts that are executed AND CI-gated AND disjoint:
+      pass ONLY the runner lines your CI actually gates on here; route executed-but-ungated
+      or --list-only counts to `declared` instead so the headline never over-counts.
       Format: "type:runner:reporterpath" where runner is one of
-      jest | vitest | playwright | pytest | bats | python-direct.
-      Multiple lines of the same type are merge-added into one byType entry.
+      jest | vitest | playwright | pytest | bats | python-direct | node | bash.
+      (node/bash count TAP-lite "ok - <label>" lines from the runner's own output.)
+      Multiple lines of the same type are merge-added into one byType entry. Disjoint
+      cascade: a parent suite that delegates to a child with output suppressed does not
+      re-print the child's total, so both are distinct runner lines (md-viewer 33+13+8=54).
     required: true
+  declared:
+    description: >
+      Optional. One line per executed-but-ungated OR --list-declared runner total, mapped
+      into tests.declared. Same "type:runner:reporterpath" format as runners. Held SEPARATE:
+      NEVER summed into tests.total or tests.byType (the neckarshore-website 308->87 fix).
+    required: false
+    default: ''
   lenses:
     description: >
       Optional. One line per overlapping classification subset, mapped into tests.lenses
       (display-only, NEVER summed into total/byType). Same "type:runner:reporterpath" format.
+    required: false
+    default: ''
+  test_result:
+    description: >
+      Optional. The result of the suite/job that produced the reporter output — typically
+      ${{ job.status }}. Empty or "success" (any case) => green (red:false). Anything else
+      => red:true: a failing run must not emit a stale-green count. The file is STILL written
+      on red (so the aggregator WARNs, not goes blind).
+    required: false
+    default: ''
+  red_detail:
+    description: >
+      Optional. One line naming the failure, emitted as red_detail when test_result is not
+      green (e.g. "1 failed: test_parser_against_real_source"). Forced to null on a green run.
+      If omitted on a red run, a generic detail naming test_result is synthesized.
     required: false
     default: ''
   endpoints:
@@ -51,9 +79,12 @@ runs:
         INPUT_REPO: ${{ inputs.repo }}
         INPUT_OUT: ${{ inputs.out }}
         INPUT_RUNNERS: ${{ inputs.runners }}
+        INPUT_DECLARED: ${{ inputs.declared }}
         INPUT_LENSES: ${{ inputs.lenses }}
         INPUT_ENDPOINTS: ${{ inputs.endpoints }}
         INPUT_SHA: ${{ inputs.sha }}
+        INPUT_TEST_RESULT: ${{ inputs.test_result }}
+        INPUT_RED_DETAIL: ${{ inputs.red_detail }}
 
 branding:
   icon: 'check-circle'

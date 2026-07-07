@@ -1,0 +1,9 @@
+ok  - 4 props parsed
+ok  - title scalar
+ok  - tags block-list
+ok  - body starts after frontmatter
+ok  - no-frontmatter passthrough
+ok  - inline list + quote strip
+ok  - empty scalar collapses
+ok  - mid-doc --- ignored
+ALL PASS

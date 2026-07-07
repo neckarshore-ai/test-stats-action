@@ -1,0 +1,8 @@
+Listing tests:
+  [chromium] › e2e/home.spec.ts:12:7 › Home › renders hero
+  [chromium] › e2e/home.spec.ts:20:7 › Home › nav links resolve
+  [chromium] › e2e/pricing.spec.ts:14:7 › Pricing › tiers render
+  [chromium] › e2e/blog.spec.ts:9:7 › Blog › index lists posts
+  [chromium] › e2e/contact.spec.ts:11:7 › Contact › form submits
+  ... (289 further e2e specs across the suite — this suite runs in NO CI job) ...
+Total: 293 tests in 18 files
