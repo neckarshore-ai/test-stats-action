@@ -28,3 +28,42 @@ jobs:
 
       - name: Validate emitted stats.json against the hardened contract schema
         run: bash tests/validate-schema.sh
+
+  # Manifest-load regression gate. The `test` job calls emit-test-stats.sh DIRECTLY and
+  # never loads action.yml, so a manifest-level bug (e.g. a live ${{ }} expression in an
+  # input field, which is evaluated at load time before any job context exists) is invisible
+  # to it. This job runs the composite action via `uses: ./` against the md-viewer golden
+  # fixtures — the first thing a real consumer does. Regression lock for the 2026-07-08
+  # producer-#1 failure (job.status in the test_result description failed the manifest load).
+  self-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      - name: Run the action against the md-viewer golden fixtures
+        uses: ./
+        with:
+          repo: neckarshore-mmps/md-viewer
+          out: self-test-stats.json
+          sha: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+          test_result: success
+          runners: |
+            unit:node:tests/fixtures/md-viewer/frontmatter.out
+            integration:bash:tests/fixtures/md-viewer/smoke.out
+            e2e:bash:tests/fixtures/md-viewer/web-smoke.out
+
+      - name: Assert the golden md-viewer 54 (proves manifest load + disjoint cascade)
+        run: |
+          jq -e '
+            .repo == "neckarshore-mmps/md-viewer"
+            and .tests.total == 54
+            and .tests.byType.unit == 8
+            and .tests.byType.integration == 13
+            and .tests.byType.e2e == 33
+            and .tests.declared == {}
+            and .red == false
+            and (.audited_sha | type == "string" and length > 0)
+          ' self-test-stats.json > /dev/null \
+            || { echo "::error::self-test stats.json is not the golden md-viewer 54"; cat self-test-stats.json; exit 1; }
+          echo "manifest loads + emits the golden md-viewer 54:"; cat self-test-stats.json
