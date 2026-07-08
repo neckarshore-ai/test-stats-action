@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/neckarshore-ai/test-stats-action/tests/stats.schema.json",
+  "title": "Estate per-repo stats.json (producer contract)",
+  "description": "Schema for the test-scope facet of the estate stats.json pipeline, hardened 2026-07-07 (red/red_detail + tests.declared). Contract: neckarshore-planning/docs/reference/stats-json-contract.md",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["repo", "audited_sha", "red", "red_detail", "tests", "updatedAt"],
+  "properties": {
+    "repo": {
+      "type": "string",
+      "pattern": "^[^/\\s]+/[^/\\s]+$",
+      "description": "owner/name — the canonical GitHub slug."
+    },
+    "audited_sha": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The repo-SHA the counts were taken on (git rev-parse HEAD)."
+    },
+    "red": {
+      "type": "boolean",
+      "description": "true if the run that produced this file was not fully green."
+    },
+    "red_detail": {
+      "type": ["string", "null"],
+      "description": "One line naming the failure when red:true; null when green."
+    },
+    "tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "byType", "declared", "lenses"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Executed AND CI-gated AND disjoint = sum(values of byType). Never includes declared or lenses."
+        },
+        "byType": {
+          "type": "object",
+          "description": "Distinct executed+gated runner totals, keyed by taxonomy.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "declared": {
+          "type": "object",
+          "description": "Executed-but-ungated OR --list-declared counts. Display-only, NEVER summed into total.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "lenses": {
+          "type": "object",
+          "description": "Overlapping classification subsets over byType. Display-only, NEVER summed into total.",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "endpoints": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional API endpoint count carried for the tile facet."
+    },
+    "updatedAt": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ISO-8601 UTC timestamp of generation."
+    }
+  }
+}

@@ -5,11 +5,15 @@
 #   - tests.total === sum(values of tests.byType)
 #   - repo + audited_sha always present
 #   - lenses (overlapping subsets) NEVER summed into total/byType
+#   - declared (executed-but-ungated) NEVER summed into total/byType
+#   - red/red_detail: a non-green run emits red:true and STILL writes the file
 #   - fail-closed-visible: a missing/unparseable reporter exits non-zero, no silent 0
 #
 # Every fixture under tests/fixtures/ is REAL captured reporter output (see README
 # § Fixtures provenance), not hand-authored — a fabricated fixture would encode a
-# wrong mental model that passes here and fails live.
+# wrong mental model that passes here and fails live. (The one exception, documented
+# in the provenance table, is the declared-split shape fixture: real playwright --list
+# FORMAT with an illustrative count, exercising the split mechanic, not the parser.)
 
 setup() {
   ROOT="$BATS_TEST_DIRNAME/.."
@@ -173,4 +177,115 @@ e2e:jest:$FIX/golden/e2e.json"
   run bash "$SCRIPT"
   [ "$status" -ne 0 ]
   [ ! -f "$OUT" ]
+}
+
+# ---- node / bash ok-line handlers (TAP-lite; md-viewer's real reporters) ----
+
+@test "node handler counts 'ok - ' lines from a real node harness report" {
+  export INPUT_RUNNERS="unit:node:$FIX/md-viewer/frontmatter.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 8 ]
+}
+
+@test "bash handler counts '  ok   - ' lines from a real bash smoke report" {
+  export INPUT_RUNNERS="e2e:bash:$FIX/md-viewer/web-smoke.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 33 ]
+}
+
+# ---- golden fixture A: md-viewer 54 (node/bash, disjoint cascade) ----
+
+@test "golden A: md-viewer reproduces total 54 = 8/13/33 disjoint, declared {}, red false" {
+  export INPUT_REPO="neckarshore-mmps/md-viewer"
+  export INPUT_RUNNERS="unit:node:$FIX/md-viewer/frontmatter.out
+integration:bash:$FIX/md-viewer/smoke.out
+e2e:bash:$FIX/md-viewer/web-smoke.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 8 ]
+  [ "$(jq '.tests.byType.integration' "$OUT")" -eq 13 ]
+  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 33 ]
+  [ "$(jq '.tests.total' "$OUT")" -eq 54 ]
+  [ "$(jq '.tests.declared' "$OUT")" = "{}" ]
+  [ "$(jq '.red' "$OUT")" = "false" ]
+  [ "$(jq '.red_detail' "$OUT")" = "null" ]
+}
+
+# ---- golden fixture B: the declared split (87 gated / 293 declared) ----
+
+@test "golden B: gated 87 total, declared e2e 293 held SEPARATE (never summed)" {
+  export INPUT_REPO="neckarshore-ai/neckarshore-website"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json
+unit:python-direct:$FIX/unittest-output.txt"
+  export INPUT_DECLARED="e2e:playwright:$FIX/declared/website-e2e-list.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.total' "$OUT")" -eq 87 ]              # 85 + 2, gated only
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 87 ]
+  [ "$(jq '.tests.declared.e2e' "$OUT")" -eq 293 ]      # the 293 is NOT in total
+  [ "$(jq '.tests.byType | has("e2e")' "$OUT")" = "false" ]
+  [ "$(jq '.tests.total == ([.tests.byType[]] | add)' "$OUT")" = "true" ]
+}
+
+# ---- golden fixture C: red run still writes ----
+
+@test "golden C: a red test_result yields red:true + non-null red_detail, file still written" {
+  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_TEST_RESULT="failure"
+  export INPUT_RED_DETAIL="1 failed: test_parser_against_real_source"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ -f "$OUT" ]                                          # STILL written on red (WARN, not blind)
+  [ "$(jq '.red' "$OUT")" = "true" ]
+  [ "$(jq -r '.red_detail' "$OUT")" = "1 failed: test_parser_against_real_source" ]
+  [ "$(jq '.tests.total' "$OUT")" -eq 82 ]              # the count is still emitted for the WARN
+}
+
+# ---- declared + red invariants ----
+
+@test "declared is display-only: counted into declared, NEVER into total or byType" {
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  export INPUT_DECLARED="e2e:playwright:$FIX/playwright-list.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.total' "$OUT")" -eq 85 ]              # declared 197 excluded
+  [ "$(jq '.tests.byType | has("e2e")' "$OUT")" = "false" ]
+  [ "$(jq '.tests.declared.e2e' "$OUT")" -eq 197 ]
+}
+
+@test "declared is {} when not provided" {
+  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.declared' "$OUT")" = "{}" ]
+}
+
+@test "red defaults to false with null red_detail when test_result unset (backward compat)" {
+  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.red' "$OUT")" = "false" ]
+  [ "$(jq '.red_detail' "$OUT")" = "null" ]
+}
+
+@test "red: a 'success' test_result (any case) is green, red_detail forced null" {
+  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_TEST_RESULT="SUCCESS"
+  export INPUT_RED_DETAIL="ignored on green"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.red' "$OUT")" = "false" ]
+  [ "$(jq '.red_detail' "$OUT")" = "null" ]
+}
+
+@test "red: a red run with no red_detail synthesizes a non-null detail" {
+  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_TEST_RESULT="failure"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.red' "$OUT")" = "true" ]
+  [ "$(jq -r '.red_detail' "$OUT")" != "null" ]
+  [ -n "$(jq -r '.red_detail' "$OUT")" ]
 }
