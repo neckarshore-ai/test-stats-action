@@ -44,10 +44,13 @@ inputs:
     default: ''
   test_result:
     description: >
-      Optional. The result of the suite/job that produced the reporter output — typically
-      ${{ job.status }}. Empty or "success" (any case) => green (red:false). Anything else
-      => red:true: a failing run must not emit a stale-green count. The file is STILL written
-      on red (so the aggregator WARNs, not goes blind).
+      Optional. The result of the suite/job that produced the reporter output. The caller
+      passes its own job-status expression (job.status) or a needs.<job>.result. Empty or
+      "success" (any case) => green (red:false). Anything else => red:true: a failing run
+      must not emit a stale-green count. The file is STILL written on red (so the aggregator
+      WARNs, not goes blind). Note for editors: never embed a live expression in a manifest
+      field — it is evaluated at action-load time (before any job context exists) and fails
+      the load. Refer to contexts by name in prose only, as above.
     required: false
     default: ''
   red_detail:
