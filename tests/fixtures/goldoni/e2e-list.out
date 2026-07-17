@@ -1,0 +1,24 @@
+(node:34665) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Listing tests:
+  [chromium] › contact-form.spec.ts:37:7 › /kontakt — ContactForm › submits valid input and shows the Grazie panel
+  [chromium] › contact-form.spec.ts:57:7 › /kontakt — ContactForm › rejects empty submission with field-level errors
+  [chromium] › contact-form.spec.ts:75:7 › /kontakt — ContactForm › rejects invalid email format
+  [chromium] › contact-form.spec.ts:91:7 › /kontakt — ContactForm › preserves user input across validation errors
+  [chromium] › contact-form.spec.ts:119:7 › /kontakt — ContactForm › rejects an oversized field instead of silently truncating it
+  [chromium] › contact-form.spec.ts:138:7 › /kontakt — ContactForm › shows a live character counter on the message field
+  [chromium] › contact-form.spec.ts:150:7 › /kontakt — ContactForm › warns before submit when the message exceeds the limit
+  [chromium] › contact-form.spec.ts:164:7 › /kontakt — ContactForm › keeps an oversized message intact across the error round-trip
+  [chromium] › contact-form.spec.ts:183:7 › /kontakt — ContactForm › honeypot submission silently returns success without leaking
+  [chromium] › feiern-form.spec.ts:39:7 › /feiern — FeiernForm › submits a fully valid celebration request and shows Grazie panel
+  [chromium] › feiern-form.spec.ts:63:7 › /feiern — FeiernForm › rejects empty submission with errors on all required fields
+  [chromium] › feiern-form.spec.ts:90:7 › /feiern — FeiernForm › rejects when phone is missing (required for Feiern)
+  [chromium] › feiern-form.spec.ts:110:7 › /feiern — FeiernForm › preserves user input across validation errors
+  [chromium] › feiern-form.spec.ts:145:7 › /feiern — FeiernForm › rejects when guestCount is zero
+  [chromium] › feiern-form.spec.ts:164:7 › /feiern — FeiernForm › rejects when guestCount is non-numeric
+  [chromium] › search.spec.ts:18:5 › Cmd+K opens search, finds a dish, Enter deep-links to the menu
+  [chromium] › search.spec.ts:29:5 › Escape closes the overlay
+  [chromium] › search.spec.ts:35:5 › mobile: header search icon opens the overlay
+  [chromium] › search.spec.ts:42:5 › a page result navigates to the page
+  [chromium] › search.spec.ts:49:5 › FAQ result deep-links and expands the answer
+Total: 20 tests in 3 files

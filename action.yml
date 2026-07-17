@@ -23,8 +23,14 @@ inputs:
       pass ONLY the runner lines your CI actually gates on here; route executed-but-ungated
       or --list-only counts to `declared` instead so the headline never over-counts.
       Format: "type:runner:reporterpath" where runner is one of
-      jest | vitest | playwright | pytest | bats | python-direct | node | bash.
-      (node/bash count TAP-lite "ok - <label>" lines from the runner's own output.)
+      jest | vitest | playwright | pytest | bats | python-direct | node | node-test | tsx | bash.
+      (node/bash count TAP-lite "ok - <label>" lines from the runner's own output.
+      node-test parses the `node --test` SUMMARY — both the TAP "# pass N" shape (node 20)
+      and the spec "i pass N" shape (node 22+) — never its ok-lines, which double-count
+      nested describes. tsx parses the bespoke "<N> passed, <M> failed" summary printed by
+      the estate's node:assert harnesses, summing one line per test file. Both force
+      red:true when the runner's own summary reports fail>0, even if test_result says
+      success — a suite failing inside a green job is how a count silently under-reports.)
       Multiple lines of the same type are merge-added into one byType entry. Disjoint
       cascade: a parent suite that delegates to a child with output suppressed does not
       re-print the child's total, so both are distinct runner lines (md-viewer 33+13+8=54).
