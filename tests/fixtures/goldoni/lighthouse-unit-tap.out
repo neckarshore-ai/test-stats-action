@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: exactly the three canonical profiles, in order
+ok 1 - exactly the three canonical profiles, in order
+  ---
+  duration_ms: 1.322417
+  type: 'test'
+  ...
+# Subtest: the retired Edge-5G / mobile-slow profile is gone
+ok 2 - the retired Edge-5G / mobile-slow profile is gone
+  ---
+  duration_ms: 0.160709
+  type: 'test'
+  ...
+# Subtest: 5G is faster than 4G — higher throughput, lower latency
+ok 3 - 5G is faster than 4G — higher throughput, lower latency
+  ---
+  duration_ms: 0.08325
+  type: 'test'
+  ...
+# Subtest: mobile profiles differ only by network — CPU throttle is equal
+ok 4 - mobile profiles differ only by network — CPU throttle is equal
+  ---
+  duration_ms: 0.064666
+  type: 'test'
+  ...
+# Subtest: performance is SOFT on every profile (advisory, never blocks)
+ok 5 - performance is SOFT on every profile (advisory, never blocks)
+  ---
+  duration_ms: 0.060083
+  type: 'test'
+  ...
+# Subtest: accessibility / best-practices / seo are HARD @95 on every profile
+ok 6 - accessibility / best-practices / seo are HARD @95 on every profile
+  ---
+  duration_ms: 0.071875
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 89.367625

@@ -23,7 +23,7 @@ jobs:
       - name: Shellcheck the transform core + helpers
         run: shellcheck emit-test-stats.sh tests/validate-schema.sh
 
-      - name: Run fixture tests (8 runner families + contract invariants + golden A/B/C + red/declared)
+      - name: Run fixture tests (10 runner families + contract invariants + golden A/B/C/D + red/declared/no-silent-zero)
         run: bats tests/emit-test-stats.bats
 
       - name: Validate emitted stats.json against the hardened contract schema

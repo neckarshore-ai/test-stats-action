@@ -1,0 +1,3 @@
+  ✗ drafts excluded under production
+    Expected values to be strictly equal:
+index-data: 4 passed, 1 failed

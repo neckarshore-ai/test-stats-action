@@ -1,0 +1,14 @@
+✔ exactly the three canonical profiles, in order (1.569959ms)
+✔ the retired Edge-5G / mobile-slow profile is gone (0.166708ms)
+✔ 5G is faster than 4G — higher throughput, lower latency (0.094375ms)
+✔ mobile profiles differ only by network — CPU throttle is equal (0.061916ms)
+✔ performance is SOFT on every profile (advisory, never blocks) (0.069292ms)
+✔ accessibility / best-practices / seo are HARD @95 on every profile (0.084875ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 87.616291

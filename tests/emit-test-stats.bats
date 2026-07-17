@@ -289,3 +289,142 @@ unit:python-direct:$FIX/unittest-output.txt"
   [ "$(jq -r '.red_detail' "$OUT")" != "null" ]
   [ -n "$(jq -r '.red_detail' "$OUT")" ]
 }
+
+# ---- node-test handler (node --test summary; TAP + spec shapes) ----
+#
+# BOTH shapes are live in the estate and both must parse: `node --test` picks its
+# default reporter by node version when piped — node 20 (what the website CI jobs
+# pin) emits TAP (`# pass N`), node 22+ emits spec (`ℹ pass N`). Counting only one
+# shape breaks silently on a node bump.
+
+@test "node-test handler counts the TAP summary from a real node --test report" {
+  export INPUT_RUNNERS="unit:node-test:$FIX/goldoni/lighthouse-unit-tap.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 6 ]
+}
+
+@test "node-test handler counts the spec summary from a real node --test report" {
+  export INPUT_RUNNERS="unit:node-test:$FIX/goldoni/lighthouse-unit-spec.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 6 ]
+}
+
+# The reason the handler parses the SUMMARY and never the ok-lines: this real red
+# fixture prints 3 `ok N -` lines for 4 tests (1 failed). ok-line counting also
+# double-counts nested describes, which the summary is immune to.
+@test "node-test handler parses the summary, NOT the ok-lines (red fixture: 3 ok-lines, summary pass 3 / fail 1)" {
+  [ "$(grep -cE '^[[:space:]]*ok [0-9]' "$FIX/node-test-red.out")" -eq 3 ]
+  export INPUT_RUNNERS="unit:node-test:$FIX/node-test-red.out"
+  export INPUT_TEST_RESULT="failure"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 3 ]
+}
+
+@test "node-test RED: a run with fail>0 in its own summary emits red:true and STILL writes the file" {
+  export INPUT_RUNNERS="unit:node-test:$FIX/node-test-red.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ -f "$OUT" ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [ "$(jq -r '.red_detail' "$OUT")" != "null" ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 3 ]
+}
+
+@test "fail-closed: node-test output with no summary at all exits non-zero" {
+  printf 'some noise\nno summary here\n' > "$BATS_TEST_TMPDIR/nosummary.out"
+  export INPUT_RUNNERS="unit:node-test:$BATS_TEST_TMPDIR/nosummary.out"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+}
+
+# ---- tsx handler (bespoke `<N> passed, <M> failed` summary) ----
+
+@test "tsx handler counts a labeled summary line from a real tsx report" {
+  export INPUT_RUNNERS="unit:tsx:$FIX/goldoni/search-index-data.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 9 ]
+}
+
+# oakwood's `test:blog:unit` chains three tsx files with `&&`; each prints its own
+# unlabeled summary line into one output, and interleaves unrelated log noise.
+@test "tsx handler SUMS multiple unlabeled summary lines and ignores interleaved noise" {
+  export INPUT_RUNNERS="unit:tsx:$FIX/oakwood/blog-unit.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 29 ]
+}
+
+@test "tsx RED: a real failing suite emits red:true, counts only the passes, still writes" {
+  export INPUT_RUNNERS="unit:tsx:$FIX/oakwood/search-index-data-red.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ -f "$OUT" ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [ "$(jq -r '.red_detail' "$OUT")" != "null" ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 4 ]
+}
+
+@test "fail-closed: tsx output with no summary line exits non-zero" {
+  printf 'ran some things\nbut printed no summary\n' > "$BATS_TEST_TMPDIR/nosummary.out"
+  export INPUT_RUNNERS="unit:tsx:$BATS_TEST_TMPDIR/nosummary.out"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+}
+
+# ---- no-silent-zero guard (red-aware) ----
+#
+# The bug class this action exists to prevent, in both directions. A GREEN run that
+# parses 0 from non-empty reporter output is a mis-wired runner (bad glob, wrong
+# adapter, a suite that never ran) and must fail LOUDLY. A RED run that parses 0 is
+# legitimate (the suite crashed/aborted) and must STILL emit red:true — dying there
+# would blind the aggregator exactly when it most needs the signal.
+
+@test "no-silent-zero: a GREEN run parsing 0 tests from non-empty output exits non-zero" {
+  printf 'v dist smoke passed - nothing this adapter can count\n' > "$BATS_TEST_TMPDIR/zero.out"
+  export INPUT_RUNNERS="unit:node:$BATS_TEST_TMPDIR/zero.out"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+  [[ "$output" == *"silent zero"* ]]
+}
+
+@test "no-silent-zero: a RED run parsing 0 tests STILL emits (red:true), never dies" {
+  printf 'x dist smoke FAILED (1):\n  - barrel is non-empty\n' > "$BATS_TEST_TMPDIR/zero.out"
+  export INPUT_RUNNERS="unit:node:$BATS_TEST_TMPDIR/zero.out"
+  export INPUT_TEST_RESULT="failure"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ -f "$OUT" ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 0 ]
+}
+
+# ---- golden fixture D: goldoni 35 (the adapter gap, closed) ----
+#
+# GOLDEN BASELINE, not a hand-picked number: every fixture below is goldoni-website's
+# OWN reporter output captured at 401cdf5, and 35 is the disjoint own-runner total
+# independently measured by Lenin at 1d55153 (report 2026-07-17-lenin-phase1-verify-queue,
+# `goldoni_website.disjoint_true`). The emitter previously reported 20 — the entire
+# CI-gated unit half (unit.yml: lighthouse 6 + search 9) fell silently on the floor
+# because neither runner had an adapter. This test is what proves the gap is closed.
+
+@test "golden D: goldoni reproduces total 35 = e2e 20 + unit 15 (6 node-test + 9 tsx), red false" {
+  export INPUT_REPO="neckarshore-websites/goldoni-website"
+  export INPUT_RUNNERS="e2e:playwright:$FIX/goldoni/e2e-list.out
+unit:node-test:$FIX/goldoni/lighthouse-unit-tap.out
+unit:tsx:$FIX/goldoni/search-index-data.out"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 20 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 15 ]
+  [ "$(jq '.tests.total' "$OUT")" -eq 35 ]
+  [ "$(jq '.tests.total' "$OUT")" -eq "$(jq '[.tests.byType[]] | add' "$OUT")" ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+  [ "$(jq -c '.tests.declared' "$OUT")" = "{}" ]
+}
