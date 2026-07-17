@@ -168,10 +168,12 @@ count_for() {
       nt_tests="$(summary_sum "$path" 'tests')"
       nt_pass="$(summary_sum "$path" 'pass')"
       nt_fail="$(summary_sum "$path" 'fail')"
-      [ -n "$nt_tests" ] && [ -n "$nt_pass" ] \
-        || die "runner 'node-test': no node:test summary in $path (expected '# pass N' (TAP, node 20) or 'ℹ pass N' (spec, node 22+)) — is this really \`node --test\` output?"
-      [ -n "$nt_fail" ] && [ "$nt_fail" -gt 0 ] \
-        && note_red "node-test ($path): the runner's own summary reports ${nt_fail} failed"
+      if [ -z "$nt_tests" ] || [ -z "$nt_pass" ]; then
+        die "runner 'node-test': no node:test summary in $path (expected '# pass N' (TAP, node 20) or 'ℹ pass N' (spec, node 22+)) — is this really \`node --test\` output?"
+      fi
+      if [ -n "$nt_fail" ] && [ "$nt_fail" -gt 0 ]; then
+        note_red "node-test ($path): the runner's own summary reports ${nt_fail} failed"
+      fi
       count="$nt_pass"
       ;;
     tsx)
@@ -190,8 +192,9 @@ count_for() {
         || die "runner 'tsx': no summary line matching '<N> passed, <M> failed' in $path — that shape is what this handler counts; a suite printing anything else needs its own handler, never a silent 0"
       tsx_pass="$(awk '{ s += $1 } END { print s }' <<<"$tsx_pairs")"
       tsx_fail="$(awk '{ s += $3 } END { print s }' <<<"$tsx_pairs")"
-      [ "$tsx_fail" -gt 0 ] \
-        && note_red "tsx ($path): the runner's own summary reports ${tsx_fail} failed"
+      if [ "$tsx_fail" -gt 0 ]; then
+        note_red "tsx ($path): the runner's own summary reports ${tsx_fail} failed"
+      fi
       count="$tsx_pass"
       ;;
     *)
