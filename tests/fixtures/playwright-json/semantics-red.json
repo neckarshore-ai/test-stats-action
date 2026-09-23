@@ -1,0 +1,510 @@
+{
+  "config": {
+    "configFile": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/playwright.config.mjs",
+    "rootDir": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "semantics.spec.mjs",
+      "file": "semantics.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "passes 1",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:01:55.045Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "04c7642b9737e0003380-0ced86103f5a67eb0d09",
+          "file": "semantics.spec.mjs",
+          "line": 4,
+          "column": 1
+        },
+        {
+          "title": "passes 2",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:01:55.055Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "04c7642b9737e0003380-7202bc210ce09c104dc3",
+          "file": "semantics.spec.mjs",
+          "line": 5,
+          "column": 1
+        },
+        {
+          "title": "passes 3 (expected failure via test.fail)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "fail",
+                  "location": {
+                    "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                    "line": 6,
+                    "column": 64
+                  }
+                }
+              ],
+              "expectedStatus": "failed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 1,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs:6:82",
+                    "location": {
+                      "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                      "column": 82,
+                      "line": 6
+                    },
+                    "snippet": "  4 | test(\"passes 1\", () => { expect(1).toBe(1); });\n  5 | test(\"passes 2\", () => { expect(2).toBe(2); });\n> 6 | test(\"passes 3 (expected failure via test.fail)\", () => { test.fail(); expect(1).toBe(2); });\n    |                                                                                  ^\n  7 | test(\"flaky: fails first attempt, passes on retry\", ({}, info) => { expect(info.retry).toBe(1); });\n  8 | test(\"fails deterministically\", () => { expect(\"red\").toBe(\"green\"); });\n  9 | test.skip(\"skipped 1\", () => {});"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                        "column": 82,
+                        "line": 6
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m2\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  4 | test(\"passes 1\", () => { expect(1).toBe(1); });\n  5 | test(\"passes 2\", () => { expect(2).toBe(2); });\n> 6 | test(\"passes 3 (expected failure via test.fail)\", () => { test.fail(); expect(1).toBe(2); });\n    |                                                                                  ^\n  7 | test(\"flaky: fails first attempt, passes on retry\", ({}, info) => { expect(info.retry).toBe(1); });\n  8 | test(\"fails deterministically\", () => { expect(\"red\").toBe(\"green\"); });\n  9 | test.skip(\"skipped 1\", () => {});\n    at /private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs:6:82"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:01:55.060Z",
+                  "annotations": [
+                    {
+                      "type": "fail",
+                      "location": {
+                        "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                        "line": 6,
+                        "column": 64
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/test-results/semantics-passes-3-expected-failure-via-test-fail-/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                    "column": 82,
+                    "line": 6
+                  }
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "04c7642b9737e0003380-e783eb38d86dfe287984",
+          "file": "semantics.spec.mjs",
+          "line": 6,
+          "column": 1
+        },
+        {
+          "title": "flaky: fails first attempt, passes on retry",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 0,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m0\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m0\u001b[39m\n    at /private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs:7:88",
+                    "location": {
+                      "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                      "column": 88,
+                      "line": 7
+                    },
+                    "snippet": "   5 | test(\"passes 2\", () => { expect(2).toBe(2); });\n   6 | test(\"passes 3 (expected failure via test.fail)\", () => { test.fail(); expect(1).toBe(2); });\n>  7 | test(\"flaky: fails first attempt, passes on retry\", ({}, info) => { expect(info.retry).toBe(1); });\n     |                                                                                        ^\n   8 | test(\"fails deterministically\", () => { expect(\"red\").toBe(\"green\"); });\n   9 | test.skip(\"skipped 1\", () => {});\n  10 | test.fixme(\"skipped 2 (fixme)\", () => {});"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                        "column": 88,
+                        "line": 7
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m1\u001b[39m\nReceived: \u001b[31m0\u001b[39m\n\n   5 | test(\"passes 2\", () => { expect(2).toBe(2); });\n   6 | test(\"passes 3 (expected failure via test.fail)\", () => { test.fail(); expect(1).toBe(2); });\n>  7 | test(\"flaky: fails first attempt, passes on retry\", ({}, info) => { expect(info.retry).toBe(1); });\n     |                                                                                        ^\n   8 | test(\"fails deterministically\", () => { expect(\"red\").toBe(\"green\"); });\n   9 | test.skip(\"skipped 1\", () => {});\n  10 | test.fixme(\"skipped 2 (fixme)\", () => {});\n    at /private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs:7:88"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:01:55.069Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/test-results/semantics-flaky-fails-first-attempt-passes-on-retry/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                    "column": 88,
+                    "line": 7
+                  }
+                },
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-09-23T20:01:55.356Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "flaky"
+            }
+          ],
+          "id": "04c7642b9737e0003380-81c7feb237c576e287c1",
+          "file": "semantics.spec.mjs",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "fails deterministically",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"\u001b[7mg\u001b[27mre\u001b[7men\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"re\u001b[7md\u001b[27m\"\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"\u001b[7mg\u001b[27mre\u001b[7men\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"re\u001b[7md\u001b[27m\"\u001b[39m\n    at /private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs:8:55",
+                    "location": {
+                      "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                      "column": 55,
+                      "line": 8
+                    },
+                    "snippet": "   6 | test(\"passes 3 (expected failure via test.fail)\", () => { test.fail(); expect(1).toBe(2); });\n   7 | test(\"flaky: fails first attempt, passes on retry\", ({}, info) => { expect(info.retry).toBe(1); });\n>  8 | test(\"fails deterministically\", () => { expect(\"red\").toBe(\"green\"); });\n     |                                                       ^\n   9 | test.skip(\"skipped 1\", () => {});\n  10 | test.fixme(\"skipped 2 (fixme)\", () => {});\n  11 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                        "column": 55,
+                        "line": 8
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"\u001b[7mg\u001b[27mre\u001b[7men\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"re\u001b[7md\u001b[27m\"\u001b[39m\n\n   6 | test(\"passes 3 (expected failure via test.fail)\", () => { test.fail(); expect(1).toBe(2); });\n   7 | test(\"flaky: fails first attempt, passes on retry\", ({}, info) => { expect(info.retry).toBe(1); });\n>  8 | test(\"fails deterministically\", () => { expect(\"red\").toBe(\"green\"); });\n     |                                                       ^\n   9 | test.skip(\"skipped 1\", () => {});\n  10 | test.fixme(\"skipped 2 (fixme)\", () => {});\n  11 |\n    at /private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs:8:55"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:01:55.366Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/test-results/semantics-fails-deterministically/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                    "column": 55,
+                    "line": 8
+                  }
+                },
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"\u001b[7mg\u001b[27mre\u001b[7men\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"re\u001b[7md\u001b[27m\"\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"\u001b[7mg\u001b[27mre\u001b[7men\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"re\u001b[7md\u001b[27m\"\u001b[39m\n    at /private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs:8:55",
+                    "location": {
+                      "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                      "column": 55,
+                      "line": 8
+                    },
+                    "snippet": "   6 | test(\"passes 3 (expected failure via test.fail)\", () => { test.fail(); expect(1).toBe(2); });\n   7 | test(\"flaky: fails first attempt, passes on retry\", ({}, info) => { expect(info.retry).toBe(1); });\n>  8 | test(\"fails deterministically\", () => { expect(\"red\").toBe(\"green\"); });\n     |                                                       ^\n   9 | test.skip(\"skipped 1\", () => {});\n  10 | test.fixme(\"skipped 2 (fixme)\", () => {});\n  11 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                        "column": 55,
+                        "line": 8
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"\u001b[7mg\u001b[27mre\u001b[7men\u001b[27m\"\u001b[39m\nReceived: \u001b[31m\"re\u001b[7md\u001b[27m\"\u001b[39m\n\n   6 | test(\"passes 3 (expected failure via test.fail)\", () => { test.fail(); expect(1).toBe(2); });\n   7 | test(\"flaky: fails first attempt, passes on retry\", ({}, info) => { expect(info.retry).toBe(1); });\n>  8 | test(\"fails deterministically\", () => { expect(\"red\").toBe(\"green\"); });\n     |                                                       ^\n   9 | test.skip(\"skipped 1\", () => {});\n  10 | test.fixme(\"skipped 2 (fixme)\", () => {});\n  11 |\n    at /private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs:8:55"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-09-23T20:01:55.645Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/test-results/semantics-fails-deterministically-retry1/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                    "column": 55,
+                    "line": 8
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "04c7642b9737e0003380-856377856af2bc7de5d0",
+          "file": "semantics.spec.mjs",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "skipped 1",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "location": {
+                    "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                    "line": 9,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:01:55.657Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                        "line": 9,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "04c7642b9737e0003380-2e7e81d9a40bbcf0df92",
+          "file": "semantics.spec.mjs",
+          "line": 9,
+          "column": 6
+        },
+        {
+          "title": "skipped 2 (fixme)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "fixme",
+                  "location": {
+                    "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                    "line": 10,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:01:55.657Z",
+                  "annotations": [
+                    {
+                      "type": "fixme",
+                      "location": {
+                        "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwsuite/tests/semantics.spec.mjs",
+                        "line": 10,
+                        "column": 6
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "04c7642b9737e0003380-a7d3625c5a0e0b3b2cf7",
+          "file": "semantics.spec.mjs",
+          "line": 10,
+          "column": 6
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-23T20:01:54.752Z",
+    "duration": 909.3299999999999,
+    "expected": 3,
+    "skipped": 2,
+    "unexpected": 1,
+    "flaky": 1
+  }
+}

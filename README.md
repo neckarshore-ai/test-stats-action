@@ -97,7 +97,8 @@ file in your CI, then name it in a `runners:` line.
 |--------|----------------------------------|------------------------|
 | `jest` | `jest --json --outputFile=r.json` | top-level `.numPassedTests` |
 | `vitest` | `vitest run --reporter=json --outputFile=r.json` | top-level `.numPassedTests` (jest-compatible) |
-| `playwright` | `playwright test --list > r.txt` | the `Total: N tests in M files` summary line |
+| `playwright` | `playwright test --list > r.txt` | the `Total: N tests in M files` summary line (**declared** tests — red-blind, see below) |
+| `playwright-json` | `PLAYWRIGHT_JSON_OUTPUT_FILE=r.json playwright test --reporter=json` | top-level `.stats`: `expected + flaky`; `unexpected > 0` or a non-empty `errors[]` → `red:true` |
 | `pytest` | `pytest --collect-only -q > r.txt` | the `N tests collected` summary line |
 | `bats` | `bats --count tests/ > r.txt` | the bare integer |
 | `python-direct` | `python -m unittest ... > r.txt 2>&1` | the `Ran N tests` summary line |
@@ -131,6 +132,21 @@ file in your CI, then name it in a `runners:` line.
 > `|| true`, a non-blocking step, or a mis-gated suite produces — and it is the one path by
 > which this action could publish a silently under-counted *green* number.
 
+> **`playwright-json` is not `playwright`.** The `playwright` family reads `--list` output: it
+> counts tests that are **declared**, never whether they passed, so it cannot see a red run.
+> `playwright-json` reads the JSON reporter of the run itself. It is named after the **format**
+> it reads, not the tool (tsa#8); the existing families keep their names. Produce the file with
+> `PLAYWRIGHT_JSON_OUTPUT_FILE` rather than redirecting stdout, and note that a CLI
+> `--reporter=json` **replaces** the reporters in your config for that run (pass
+> `--reporter=json,list` to keep a human-readable log alongside it).
+
+> **`playwright-json` flags red from the runner's own report**, like `node-test`/`tsx`:
+> `stats.unexpected > 0` **or** a non-empty top-level `errors[]` forces `red:true`, whatever
+> `test_result` says. `errors[]` is where load, `globalSetup` and `globalTeardown` failures land —
+> they make Playwright exit non-zero while `stats` can stay all green (fixture
+> `teardown-error.json`: `expected 2, unexpected 0`, one error). This is robustness against a
+> workflow that forgets to wire `test_result` to the executing job; it adds no tests to any count.
+
 > **The `tsx` pattern ships in the action, not in your workflow.** The `<N> passed, <M> failed`
 > shape is allow-listed here deliberately: a consumer-supplied regex would turn the `runners`
 > input into an injection surface. A suite printing a different shape needs a handler added
@@ -141,6 +157,14 @@ file in your CI, then name it in a `runners:` line.
 > (`omnopsis-backend`). On a green CI run `numPassedTests == numTotalTests` (any failure
 > would already make CI red). Repos with deliberately-skipped tests should confirm their
 > reconciliation target counts the same way.
+>
+> **`playwright-json` counts `stats.expected + stats.flaky`** — tests that passed in the end,
+> the same meaning as `numPassedTests`. Excluded: `skipped` (which includes `test.skip`,
+> `test.fixme` and tests interrupted by a timeout/abort) and `unexpected`. A `test.fail()` test
+> that fails as declared is `expected` in Playwright's own outcome model and is counted. Playwright
+> counts **per test × project × `repeatEach`**, so a suite run in two browser projects counts
+> twice — exactly as its `--list` `Total:` line does (goldoni @`77d8b72`: `--list` 24, JSON 24).
+> *Proposal, pending review by the test-governance steward.*
 
 ## Contract guarantees (enforced by the fixture tests + schema)
 
@@ -187,6 +211,9 @@ passes here and fails live. Sources (captured 2026-06-21):
 | `oakwood/blog-unit.out` | `oakwoodgolfclub-website` @`56285c2` `npm run test:blog:unit` — three `tsx` files chained with `&&` into one output, interleaved log noise included (captured 2026-07-17) | 9 + 12 + 8 = **29** |
 | `oakwood/search-index-data-red.out` | `oakwoodgolfclub-website` @`56285c2` `tsx tests/search/index-data.test.ts` — genuinely RED at HEAD (known #257, deliberately ungated) (captured 2026-07-17) | 4 pass / 1 fail |
 | `playwright-list.txt` | `neckarshore-website` `playwright test --list` | 197 |
+| `playwright-json/goldoni-e2e.json` | `goldoni-website` @`77d8b72` `PLAYWRIGHT_JSON_OUTPUT_FILE=… playwright test --grep-invert @external --reporter=json`, Playwright 1.59.1 (captured 2026-09-23); same-SHA `--list` reports `Total: 24 tests in 4 files` | 24 |
+| `playwright-json/semantics-red.json` | authored suite [`playwright-json/authored/semantics.spec.mjs`](tests/fixtures/playwright-json/authored/semantics.spec.mjs) (`retries: 1`), real `--reporter=json` output, Playwright 1.59.1 (captured 2026-09-23) — see the note below | expected 3 / skipped 2 / unexpected 1 / flaky 1 → **4** |
+| `playwright-json/teardown-error.json` | authored suite [`playwright-json/authored/green.spec.mjs`](tests/fixtures/playwright-json/authored/green.spec.mjs) + a throwing `globalTeardown`, real `--reporter=json` output, Playwright 1.59.1 (captured 2026-09-23) | expected 2, `errors[]` 1 → **2**, red |
 | `pytest-collect.txt` | real `pytest 9.1.1 --collect-only -q` | 5 |
 | `unittest-output.txt` | real `python -m unittest` | 2 |
 | `vitest-report.json` | `omnopsis-contracts` `vitest run --reporter=json` | 85 |
@@ -218,6 +245,16 @@ Three **golden conformance fixtures**:
 > `fail>0` forces `red:true`, and the handler reads the summary (`pass 3`) rather than the
 > three `ok N -` lines a red run happens to print.
 
+> **The two authored `playwright-json` fixtures.** The goldoni capture is `24/0/0/0`, and at
+> those numbers every plausible count reading — `expected`, `expected + flaky`, total minus
+> skipped, total — gives 24, so it cannot prove which one the handler implements.
+> `semantics-red.json` is a purpose-written suite whose outcomes make the readings diverge
+> (**3 / 4 / 5 / 7**), and the test pins **4**. `teardown-error.json` is the only way to get a
+> run whose `stats` are all green while Playwright itself exits 1. Both are real reporter output
+> of the committed sources in [`tests/fixtures/playwright-json/authored/`](tests/fixtures/playwright-json/authored),
+> run with the goldoni-website `node_modules` (Playwright 1.59.1); the configs are saved as
+> `*.config.mjs` with `testDir: "./tests"`, so reproducing means placing the spec under `tests/`.
+
 > **The one shape fixture: `declared/website-e2e-list.txt`.** This single fixture is **real
 > playwright `--list` FORMAT** with an **illustrative count (293)** rather than a captured one —
 > it exercises the *declared-split mechanic* (a large ungated e2e suite held out of `total`),
@@ -233,7 +270,7 @@ Three **golden conformance fixtures**:
 
 ```bash
 npm install -g bats@1.13.0 ajv-cli@5.0.0   # pinned, exact
-bats tests/emit-test-stats.bats            # counts + contract invariants (28 tests)
+bats tests/emit-test-stats.bats            # counts + contract invariants (49 tests)
 shellcheck emit-test-stats.sh tests/validate-schema.sh
 bash tests/validate-schema.sh              # emitted stats.json validates against tests/stats.schema.json
 ```

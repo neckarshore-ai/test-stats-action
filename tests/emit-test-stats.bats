@@ -428,3 +428,92 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
   [ "$(jq -r '.red' "$OUT")" = "false" ]
   [ "$(jq -c '.tests.declared' "$OUT")" = "{}" ]
 }
+
+# ---- playwright-json: the Playwright JSON reporter (a FORMAT-named family, tsa#8) ----
+#
+# Reads `stats: {expected, skipped, unexpected, flaky}` (playwright lib/reporters/json.js,
+# one ++stats[test.outcome()] per test x project x repeatEach). There is no numPassedTests.
+# count = expected + flaky (passed in the end), consistent with jest/vitest numPassedTests.
+# The existing `playwright` family (--list, declared tests, red-blind) is untouched.
+#
+# The goldoni capture is 24/0/0/0 and cannot tell count readings apart, so the authored
+# semantics suite is built so that every reading yields a DIFFERENT number:
+#   expected 3 | skipped 2 | unexpected 1 | flaky 1
+#   expected=3  expected+flaky=4  total-skipped=5  total=7   -> the assertion pins 4.
+
+@test "playwright-json handler counts expected+flaky from a real goldoni JSON report (24)" {
+  export INPUT_RUNNERS="e2e:playwright-json:$FIX/playwright-json/goldoni-e2e.json"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 24 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "playwright-json count semantics: expected+flaky (4), not expected (3), total-skipped (5) or total (7)" {
+  export INPUT_RUNNERS="e2e:playwright-json:$FIX/playwright-json/semantics-red.json"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 4 ]
+}
+
+@test "playwright-json RED: stats.unexpected>0 emits red:true with the counts even when test_result says success" {
+  export INPUT_RUNNERS="e2e:playwright-json:$FIX/playwright-json/semantics-red.json"
+  export INPUT_TEST_RESULT="success"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ -f "$OUT" ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [[ "$(jq -r '.red_detail' "$OUT")" == *"1 unexpected"* ]]
+}
+
+@test "playwright-json RED: a non-empty errors[] (globalTeardown threw, stats all green) emits red:true" {
+  export INPUT_RUNNERS="e2e:playwright-json:$FIX/playwright-json/teardown-error.json"
+  export INPUT_TEST_RESULT="success"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 2 ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [[ "$(jq -r '.red_detail' "$OUT")" == *"1 top-level error"* ]]
+}
+
+@test "fail-closed: playwright-json report without .stats exits non-zero, writes nothing" {
+  jq 'del(.stats)' "$FIX/playwright-json/goldoni-e2e.json" > "$BATS_TEST_TMPDIR/r.json"
+  export INPUT_RUNNERS="e2e:playwright-json:$BATS_TEST_TMPDIR/r.json"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+  [[ "$output" == *"playwright-json"* ]]
+}
+
+@test "fail-closed: playwright-json with .stats.expected missing but flaky>0 exits non-zero (no null+N)" {
+  jq 'del(.stats.expected) | .stats.flaky = 5' "$FIX/playwright-json/goldoni-e2e.json" > "$BATS_TEST_TMPDIR/r.json"
+  export INPUT_RUNNERS="e2e:playwright-json:$BATS_TEST_TMPDIR/r.json"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+  [[ "$output" == *"no .stats with numeric"* ]]   # dies at the type check, not later by accident
+}
+
+@test "fail-closed: playwright-json with string-typed stats exits non-zero (no string concatenation)" {
+  jq '.stats.expected = "2" | .stats.flaky = "4" | .stats.skipped = "0" | .stats.unexpected = "0"' \
+    "$FIX/playwright-json/goldoni-e2e.json" > "$BATS_TEST_TMPDIR/r.json"
+  export INPUT_RUNNERS="e2e:playwright-json:$BATS_TEST_TMPDIR/r.json"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+  [[ "$output" == *"no .stats with numeric"* ]]   # dies at the type check, not later by accident
+}
+
+@test "fail-closed: playwright-json fed non-JSON (e.g. --list text) exits non-zero" {
+  export INPUT_RUNNERS="e2e:playwright-json:$FIX/playwright-list.txt"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+}
+
+@test "the existing playwright (--list) family is unchanged by playwright-json" {
+  export INPUT_RUNNERS="e2e:playwright:$FIX/playwright-list.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 197 ]
+}
