@@ -43,5 +43,11 @@ INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt" \
 INPUT_TEST_RESULT="failure" INPUT_RED_DETAIL="1 failed: test_parser_against_real_source" \
 bash "$SCRIPT" >/dev/null || { echo "validate-schema: sample C emit failed" >&2; exit 1; }
 
-echo "validate-schema: validating A/B/C against $(basename "$SCHEMA")"
-"$AJV" validate -s "$SCHEMA" -d "$WORK/a.json" -d "$WORK/b.json" -d "$WORK/c.json"
+# D — playwright-json, adapter-detected red (stats.unexpected>0 on a success test_result).
+INPUT_REPO="owner/repo" INPUT_OUT="$WORK/d.json" \
+INPUT_RUNNERS="e2e:playwright-json:$FIX/playwright-json/semantics-red.json" \
+INPUT_TEST_RESULT="success" \
+bash "$SCRIPT" >/dev/null 2>&1 || { echo "validate-schema: sample D emit failed" >&2; exit 1; }
+
+echo "validate-schema: validating A/B/C/D against $(basename "$SCHEMA")"
+"$AJV" validate -s "$SCHEMA" -d "$WORK/a.json" -d "$WORK/b.json" -d "$WORK/c.json" -d "$WORK/d.json"

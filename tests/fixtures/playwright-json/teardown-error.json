@@ -1,0 +1,151 @@
+{
+  "config": {
+    "configFile": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwteardown/playwright.config.mjs",
+    "rootDir": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwteardown/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwteardown/teardown.mjs",
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwteardown/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwteardown/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "green.spec.mjs",
+      "file": "green.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "passes 1",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:02:18.369Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "31624fe6c8e4b4fe0a3f-0e5c0f8f9cade592e73d",
+          "file": "green.spec.mjs",
+          "line": 3,
+          "column": 1
+        },
+        {
+          "title": "passes 2",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T20:02:18.379Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "31624fe6c8e4b4fe0a3f-1a8a46c38db9b0f87384",
+          "file": "green.spec.mjs",
+          "line": 4,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "message": "Error: global teardown failed",
+      "stack": "Error: global teardown failed\n    at default (/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwteardown/teardown.mjs:1:36)",
+      "location": {
+        "file": "/private/tmp/claude-501/-Users-germanrauhut-com-Developer-projects-neckarshore-ai-neckarshore-planning-bob/5ad49243-391a-46cc-8444-1fee6b403338/scratchpad/pwteardown/teardown.mjs",
+        "column": 36,
+        "line": 1
+      },
+      "snippet": "\u001b[90m   at \u001b[39m../teardown.mjs:1\n\n> 1 | export default async () => { throw new Error(\"global teardown failed\"); };\n    |                                    ^\n  2 |"
+    }
+  ],
+  "stats": {
+    "startTime": "2026-09-23T20:02:18.073Z",
+    "duration": 327.38700000000006,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

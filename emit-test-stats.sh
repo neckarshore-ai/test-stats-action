@@ -120,6 +120,45 @@ count_for() {
       # `playwright test --list` ends with an authoritative "Total: N tests in M files".
       count="$(grep -oE 'Total: [0-9]+ tests?' "$path" | grep -oE '[0-9]+' | tail -1)"
       ;;
+    playwright-json)
+      # The Playwright JSON reporter (`playwright test --reporter=json`). Named after the
+      # FORMAT, not the tool (tsa#8): the `playwright` family above reads `--list` text,
+      # counts DECLARED tests and is red-blind; this one reads what actually RAN.
+      #
+      # Shape (playwright lib/reporters/json.js): top-level
+      #   stats: { expected, skipped, unexpected, flaky, startTime, duration }
+      # filled by one ++stats[test.outcome()] per test x project x repeatEach. There is
+      # NO numPassedTests. count = expected + flaky — passed in the end, consistent with
+      # jest/vitest numPassedTests. skipped (incl. fixme/interrupted) is excluded;
+      # a test.fail() test that fails as expected is counted, the runner calls it expected.
+      #
+      # Every field is type-checked BEFORE the arithmetic. A bare `.expected + .flaky`
+      # would not fail closed: jq's null + N is N (a missing expected silently emits the
+      # flaky count) and "2" + "4" concatenates to "24", which is_uint would accept.
+      local pj
+      pj="$(jq -er '
+        .stats as $s
+        | if ($s | type) != "object" then error("no .stats object") else . end
+        | [$s.expected, $s.skipped, $s.unexpected, $s.flaky]
+        | if all(type == "number" and . >= 0 and . == floor) then map(tostring) | join(",")
+          else error(".stats.{expected,skipped,unexpected,flaky} must all be non-negative integers") end
+      ' "$path" 2>/dev/null)" \
+        || die "runner 'playwright-json': reporter at $path has no .stats with numeric expected/skipped/unexpected/flaky — is this really \`playwright test --reporter=json\` output?"
+      local pj_expected pj_skipped pj_unexpected pj_flaky pj_errors
+      # Comma, not tab: tab is IFS whitespace, so read would collapse an empty field and
+      # shift the others left — the type check above is what guarantees no empty field.
+      IFS=',' read -r pj_expected pj_skipped pj_unexpected pj_flaky <<<"$pj"
+      # errors[] carries load / globalSetup / globalTeardown failures. They make the run
+      # exit non-zero while stats can stay all-green (captured: teardown-error.json),
+      # so a job that swallows the exit code would otherwise publish a green count.
+      # A present-but-not-an-array errors field is treated as one error (fail toward red).
+      pj_errors="$(jq -r '(.errors // []) | if type == "array" then length else 1 end' "$path" 2>/dev/null)" \
+        || pj_errors=1
+      if [ "$pj_unexpected" -gt 0 ] || [ "$pj_errors" -gt 0 ]; then
+        note_red "playwright-json ($path): the runner's own report has ${pj_unexpected} unexpected, ${pj_errors} top-level error(s) (expected ${pj_expected}, flaky ${pj_flaky}, skipped ${pj_skipped})"
+      fi
+      count="$((pj_expected + pj_flaky))"
+      ;;
     pytest)
       # `pytest --collect-only -q` ends with "N tests collected in Xs".
       count="$(grep -oE '[0-9]+ tests? collected' "$path" | grep -oE '[0-9]+' | tail -1)"
@@ -198,7 +237,7 @@ count_for() {
       count="$tsx_pass"
       ;;
     *)
-      die "unknown runner family: '$runner' (supported: jest vitest playwright pytest bats python-direct node node-test tsx bash)"
+      die "unknown runner family: '$runner' (supported: jest vitest playwright playwright-json pytest bats python-direct node node-test tsx bash)"
       ;;
   esac
   is_uint "$count" \
