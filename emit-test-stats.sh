@@ -160,8 +160,12 @@ count_for() {
       count="$((pj_expected + pj_flaky))"
       ;;
     pytest)
-      # `pytest --collect-only -q` ends with "N tests collected in Xs".
-      count="$(grep -oE '[0-9]+ tests? collected' "$path" | grep -oE '[0-9]+' | tail -1)"
+      # `pytest --collect-only -q` ends with "N tests collected in Xs", or, when the
+      # run deselects (-m / -k / --deselect), "S/N tests collected (D deselected)".
+      # Only the S selected tests run in CI, so the selected form is read first —
+      # the plain pattern would match the "N tests collected" tail of it (#11).
+      count="$(grep -oE '[0-9]+/[0-9]+ tests? collected' "$path" | grep -oE '^[0-9]+' | tail -1)"
+      [ -n "$count" ] || count="$(grep -oE '[0-9]+ tests? collected' "$path" | grep -oE '[0-9]+' | tail -1)"
       ;;
     bats)
       # `bats --count` prints a bare integer.

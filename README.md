@@ -99,7 +99,7 @@ file in your CI, then name it in a `runners:` line.
 | `vitest` | `vitest run --reporter=json --outputFile=r.json` | top-level `.numPassedTests` (jest-compatible) |
 | `playwright` | `playwright test --list > r.txt` | the `Total: N tests in M files` summary line (**declared** tests — red-blind, see below) |
 | `playwright-json` | `PLAYWRIGHT_JSON_OUTPUT_FILE=r.json playwright test --reporter=json` | top-level `.stats`: `expected + flaky`; `unexpected > 0` or a non-empty `errors[]` → `red:true` |
-| `pytest` | `pytest --collect-only -q > r.txt` | the `N tests collected` summary line |
+| `pytest` | `pytest --collect-only -q > r.txt` | the `N tests collected` summary line; with a deselection (`S/N tests collected (D deselected)`) the selected `S` |
 | `bats` | `bats --count tests/ > r.txt` | the bare integer |
 | `python-direct` | `python -m unittest ... > r.txt 2>&1` | the `Ran N tests` summary line |
 | `node` | `node your-test.mjs > r.txt` | count of TAP-lite `ok - <label>` lines (a hand-rolled Node harness) |
@@ -215,6 +215,7 @@ passes here and fails live. Sources (captured 2026-06-21):
 | `playwright-json/semantics-red.json` | authored suite [`playwright-json/authored/semantics.spec.mjs`](tests/fixtures/playwright-json/authored/semantics.spec.mjs) (`retries: 1`), real `--reporter=json` output, Playwright 1.59.1 (captured 2026-09-23) — see the note below | expected 3 / skipped 2 / unexpected 1 / flaky 1 → **4** |
 | `playwright-json/teardown-error.json` | authored suite [`playwright-json/authored/green.spec.mjs`](tests/fixtures/playwright-json/authored/green.spec.mjs) + a throwing `globalTeardown`, real `--reporter=json` output, Playwright 1.59.1 (captured 2026-09-23) | expected 2, `errors[]` 1 → **2**, red |
 | `pytest-collect.txt` | real `pytest 9.1.1 --collect-only -q` | 5 |
+| `pytest-collect-deselected.txt` | real `pytest 9.1.1 --collect-only -q -m "not slow"` (2 of 6 deselected) | 4 |
 | `unittest-output.txt` | real `python -m unittest` | 2 |
 | `vitest-report.json` | `omnopsis-contracts` `vitest run --reporter=json` | 85 |
 

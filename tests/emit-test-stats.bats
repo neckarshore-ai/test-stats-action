@@ -55,6 +55,15 @@ setup() {
   [ "$(jq '.tests.byType.unit' "$OUT")" -eq 5 ]
 }
 
+@test "pytest handler counts the SELECTED tests when a run deselects (N/M tests collected)" {
+  # pytest -m/-k/--deselect prints "4/6 tests collected (2 deselected)"; the 2
+  # deselected tests never run in CI, so they must not be counted as gated (#11).
+  export INPUT_RUNNERS="unit:pytest:$FIX/pytest-collect-deselected.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 4 ]
+}
+
 @test "bats handler counts the bare integer from a real bats --count report" {
   export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
   run bash "$SCRIPT"

@@ -1,0 +1,6 @@
+test_sample.py::test_a
+test_sample.py::TestGroup::test_b
+test_sample.py::test_p[1]
+test_sample.py::test_p[2]
+
+4/6 tests collected (2 deselected) in 0.00s
