@@ -1,0 +1,7 @@
+1..4
+ok 1 a passes
+ok 2 b is skipped # skip not on this host
+not ok 3 c fails
+# (in test file /tmp/mixed.bats, line 3)
+#   `@test "c fails" { false; }' failed
+ok 4 d passes

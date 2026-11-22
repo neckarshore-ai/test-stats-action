@@ -171,6 +171,34 @@ count_for() {
       # `bats --count` prints a bare integer.
       count="$(trim "$(cat "$path")")"
       ;;
+    bats-tap)
+      # The gated bats run's OWN TAP stream (`bats --formatter tap`, or `--report-formatter tap`
+      # for a report file beside the pretty output). planning #4209 step 1: the count comes from
+      # the run that the gate executed, never from `bats --count` (a listing, see `bats` above).
+      #
+      # Shape (bats 1.14.0, fixtures in tests/fixtures/bats-tap/): a plan line `1..N` first, then
+      # one result line per test, `ok N name`, `ok N name # skip reason` or `not ok N name`;
+      # failure detail and warnings are `#` comment lines. Only lines that BEGIN with `ok` or
+      # `not ok` are results, so an "ok" quoted inside a comment line is not one.
+      #   counted = ok lines without a `# skip` directive (case-insensitive, TAP's rule)
+      #   red     = any `not ok`, OR ok + not ok != N: a run that died part-way prints fewer
+      #             result lines than its plan and may print no `not ok` at all
+      #             (bats: "Executed 2 instead of expected 3 tests").
+      # No plan line is a refusal: without it a truncated stream cannot be told from a whole one.
+      local bt_plan bt_ok bt_skip bt_notok
+      bt_plan="$(grep -m1 -oE '^1\.\.[0-9]+' "$path" | cut -d. -f3)"
+      [ -n "$bt_plan" ] \
+        || die "runner 'bats-tap': no TAP plan line '1..N' in $path — is this really \`bats --formatter tap\` output? (a \`bats --count\` integer is a listing and belongs to the \`bats\` family)"
+      bt_ok="$(grep -cE '^ok[[:space:]]' "$path" || true)"
+      bt_skip="$(grep -E '^ok[[:space:]]' "$path" | grep -ciE '#[[:space:]]*skip' || true)"
+      bt_notok="$(grep -cE '^not ok[[:space:]]' "$path" || true)"
+      if [ "$bt_notok" -gt 0 ]; then
+        note_red "bats-tap ($path): the run's own TAP stream has ${bt_notok} not ok (ok ${bt_ok}, of which skip ${bt_skip}; plan 1..${bt_plan})"
+      elif [ "$((bt_ok + bt_notok))" -ne "$bt_plan" ]; then
+        note_red "bats-tap ($path): executed $((bt_ok + bt_notok)) of plan 1..${bt_plan} — the run stopped part-way"
+      fi
+      count="$((bt_ok - bt_skip))"
+      ;;
     python-direct)
       # stdlib unittest prints "Ran N tests in Xs".
       count="$(grep -oE 'Ran [0-9]+ tests?' "$path" | grep -oE '[0-9]+' | tail -1)"
@@ -241,7 +269,7 @@ count_for() {
       count="$tsx_pass"
       ;;
     *)
-      die "unknown runner family: '$runner' (supported: jest vitest playwright playwright-json pytest bats python-direct node node-test tsx bash)"
+      die "unknown runner family: '$runner' (supported: jest vitest playwright playwright-json pytest bats bats-tap python-direct node node-test tsx bash)"
       ;;
   esac
   is_uint "$count" \

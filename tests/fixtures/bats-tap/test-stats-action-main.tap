@@ -1,0 +1,51 @@
+1..50
+ok 1 jest handler counts numPassedTests from a real jest --json report
+ok 2 vitest handler counts numPassedTests from a real vitest --reporter=json report
+ok 3 playwright handler counts 'Total: N tests' from a real --list text report
+ok 4 pytest handler counts 'N tests collected' from a real --collect-only -q report
+ok 5 pytest handler counts the SELECTED tests when a run deselects (N/M tests collected)
+ok 6 bats handler counts the bare integer from a real bats --count report
+ok 7 python-direct handler counts 'Ran N tests' from a real unittest report
+ok 8 contract: total equals sum(byType) across mixed runners
+ok 9 contract: repo and audited_sha are always present
+ok 10 merge-add: two lines of the same type sum into one byType entry
+ok 11 lenses are display-only: counted into lenses, NEVER into total or byType
+ok 12 endpoints input is included when provided
+ok 13 endpoints key is omitted when not provided
+ok 14 golden fixture: backend's three jest reports reproduce byType 302/27/255 and total 584
+ok 15 fail-closed: a missing reporter file exits non-zero and writes no stats
+ok 16 fail-closed: a jest report without numPassedTests exits non-zero
+ok 17 fail-closed: an unknown runner family exits non-zero
+ok 18 fail-closed: a malformed runners line (no type) exits non-zero
+ok 19 fail-closed: empty runners (no producers) exits non-zero
+ok 20 node handler counts 'ok - ' lines from a real node harness report
+ok 21 bash handler counts '  ok   - ' lines from a real bash smoke report
+ok 22 golden A: md-viewer reproduces total 54 = 8/13/33 disjoint, declared {}, red false
+ok 23 golden B: gated 87 total, declared e2e 293 held SEPARATE (never summed)
+ok 24 golden C: a red test_result yields red:true + non-null red_detail, file still written
+ok 25 declared is display-only: counted into declared, NEVER into total or byType
+ok 26 declared is {} when not provided
+ok 27 red defaults to false with null red_detail when test_result unset (backward compat)
+ok 28 red: a 'success' test_result (any case) is green, red_detail forced null
+ok 29 red: a red run with no red_detail synthesizes a non-null detail
+ok 30 node-test handler counts the TAP summary from a real node --test report
+ok 31 node-test handler counts the spec summary from a real node --test report
+ok 32 node-test handler parses the summary, NOT the ok-lines (red fixture: 3 ok-lines, summary pass 3 / fail 1)
+ok 33 node-test RED: a run with fail>0 in its own summary emits red:true and STILL writes the file
+ok 34 fail-closed: node-test output with no summary at all exits non-zero
+ok 35 tsx handler counts a labeled summary line from a real tsx report
+ok 36 tsx handler SUMS multiple unlabeled summary lines and ignores interleaved noise
+ok 37 tsx RED: a real failing suite emits red:true, counts only the passes, still writes
+ok 38 fail-closed: tsx output with no summary line exits non-zero
+ok 39 no-silent-zero: a GREEN run parsing 0 tests from non-empty output exits non-zero
+ok 40 no-silent-zero: a RED run parsing 0 tests STILL emits (red:true), never dies
+ok 41 golden D: goldoni reproduces total 35 = e2e 20 + unit 15 (6 node-test + 9 tsx), red false
+ok 42 playwright-json handler counts expected+flaky from a real goldoni JSON report (24)
+ok 43 playwright-json count semantics: expected+flaky (4), not expected (3), total-skipped (5) or total (7)
+ok 44 playwright-json RED: stats.unexpected>0 emits red:true with the counts even when test_result says success
+ok 45 playwright-json RED: a non-empty errors[] (globalTeardown threw, stats all green) emits red:true
+ok 46 fail-closed: playwright-json report without .stats exits non-zero, writes nothing
+ok 47 fail-closed: playwright-json with .stats.expected missing but flaky>0 exits non-zero (no null+N)
+ok 48 fail-closed: playwright-json with string-typed stats exits non-zero (no string concatenation)
+ok 49 fail-closed: playwright-json fed non-JSON (e.g. --list text) exits non-zero
+ok 50 the existing playwright (--list) family is unchanged by playwright-json

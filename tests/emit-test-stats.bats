@@ -526,3 +526,76 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
   [ "$status" -eq 0 ]
   [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 197 ]
 }
+
+# --- bats-tap: the count from the gated run's own TAP stream (planning #4209 step 1) --------
+# Fixtures captured with bats 1.14.0 `--formatter tap` on 2026-11-22: this repo's own suite on
+# main c019cb2 (50 of 50; a public repo, so no private suite's test names) and three small suites for skip, fail and a run that
+# died part-way (bats: "Executed 2 instead of expected 3 tests"). Counted = `ok N` lines without
+# a `# skip` directive. Red = any `not ok`, or executed (ok + not ok) != the plan `1..N`.
+
+@test "bats-tap counts every ok line of a real run of this repo's suite (50)" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/test-stats-action-main.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 50 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "bats-tap does not count a skipped test (3 ok, 1 skip -> 2)" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/green-skip.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "RED PROOF bats-tap: a not ok line emits red:true even when test_result says success" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/mixed-red.tap"
+  export INPUT_TEST_RESULT="success"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [[ "$(jq -r '.red_detail' "$OUT")" == *"1 not ok"* ]]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+}
+
+@test "RED PROOF bats-tap: a run that executed fewer tests than its plan emits red:true" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/crashed.tap"
+  export INPUT_TEST_RESULT="success"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [[ "$(jq -r '.red_detail' "$OUT")" == *"executed 2 of plan 1..3"* ]]
+}
+
+@test "fail-closed: bats-tap without a plan line exits non-zero, writes nothing" {
+  printf 'ok 1 a\nok 2 b\n' > "$BATS_TEST_TMPDIR/noplan.tap"
+  export INPUT_RUNNERS="unit:bats-tap:$BATS_TEST_TMPDIR/noplan.tap"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+  [[ "$output" == *"no TAP plan"* ]]
+}
+
+@test "fail-closed: bats-tap fed a bats --count integer exits non-zero (a listing is not a run)" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-count.txt"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+}
+
+@test "bats-tap: a # skip directive is matched case-insensitively, and an ok inside a comment line is not counted" {
+  printf '1..3\nok 1 a\nok 2 b # SKIP later\n# ok 9 not a result line\nok 3 c\n' > "$BATS_TEST_TMPDIR/case.tap"
+  export INPUT_RUNNERS="unit:bats-tap:$BATS_TEST_TMPDIR/case.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "the existing bats (--count) family is unchanged by bats-tap" {
+  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 82 ]
+}
