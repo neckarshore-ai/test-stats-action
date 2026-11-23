@@ -171,6 +171,57 @@ count_for() {
       # `bats --count` prints a bare integer.
       count="$(trim "$(cat "$path")")"
       ;;
+    bats-tap)
+      # The gated bats run's OWN timed TAP stream (`bats --formatter tap -T > r.tap`; not a
+      # --report-formatter file, see below). planning #4209 step 1: the count comes from
+      # the run that the gate executed, never from `bats --count` (a listing, see `bats` above).
+      #
+      # Shape (bats 1.14.0, fixtures in tests/fixtures/bats-tap/): a plan line `1..N` first, then
+      # one result line per test, `ok N name`, `ok N name # skip reason` or `not ok N name`;
+      # failure detail and warnings are `#` comment lines. Only lines that BEGIN with `ok` or
+      # `not ok` are results, so an "ok" quoted inside a comment line is not one.
+      # bats does not escape `#` in a test name, so without timing a passing test named
+      # `x # skip y` and a test `x` skipped for `y` print the same line (Lenin on #15; bats'
+      # pretty and junit formatters miscount that pair as well). Only the timed stream of
+      # `bats --formatter tap -T` is read: there bats prints the runner's timing right after the
+      # name (bats-exec-test, the same in 1.10.0 to 1.14.0), so per ok line
+      #   pass    = ends in ` in Nms`                       (counted)
+      #   skip    = carries ` in Nms # skip` and does not end in ` in Nms`
+      #   refused = both (a skip reason that itself ends in a timing, Lenin's row 7, or a name
+      #             carrying ` in Nms # skip`): a wrong number with no flag is the one thing
+      #             this emitter must not produce, so the run is refused and the line named
+      #   refused = neither: the run was not timed, or a --report-formatter on the same call
+      #             moved the stream off the timed path (bats-format-tap writes ` # in N ms`)
+      # No plan line is a refusal: without it a truncated stream cannot be told from a whole one.
+      local bt_plan bt_ok bt_skip bt_notok
+      bt_plan="$(grep -m1 -oE '^1\.\.[0-9]+' "$path" | cut -d. -f3)"
+      [ -n "$bt_plan" ] \
+        || die "runner 'bats-tap': no TAP plan line '1..N' in $path — is this really \`bats --formatter tap\` output? (a \`bats --count\` integer is a listing and belongs to the \`bats\` family)"
+      bt_ok="$(grep -cE '^ok[[:space:]]' "$path" || true)"
+      bt_notok="$(grep -cE '^not ok[[:space:]]' "$path" || true)"
+      local bt_cls bt_pass bt_both bt_none
+      bt_cls="$(grep -E '^ok[[:space:]]' "$path" | awk '
+        { p = ($0 ~ /[[:space:]]in [0-9]+ms[[:space:]]*$/)
+          k = (tolower($0) ~ /[[:space:]]in [0-9]+ms[[:space:]]+#[[:space:]]*skip([[:space:]]|$)/)
+          if (p && k) { b++; if (fb == "") fb = $0 } else if (p) n++; else if (!k) { z++; if (fz == "") fz = $0 } }
+        END { printf "%d %d %d\037%s\037%s\n", n, b, z, fb, fz }')"
+      local bt_counts bt_fb bt_fz
+      IFS=$'\037' read -r bt_counts bt_fb bt_fz <<<"$bt_cls"
+      read -r bt_pass bt_both bt_none <<<"$bt_counts"
+      if [ "$bt_both" -gt 0 ]; then
+        die "runner 'bats-tap': ${bt_both} ok line(s) in $path are ambiguous, a pass and a skip at once (a skip reason that ends in a timing, or a test name that carries ' in Nms # skip'); first: '${bt_fb}'. Reword that skip reason or name"
+      fi
+      if [ "$bt_none" -gt 0 ]; then
+        die "runner 'bats-tap': ${bt_none} ok line(s) in $path carry no timing of the form ' in Nms' (first: '${bt_fz}') — run bats with --formatter tap -T (--timing), and without --report-formatter on the same call, which moves the stream off the timed path: bats does not escape '#' in a test name, so only the timed stream tells a pass from a skip"
+      fi
+      bt_skip="$((bt_ok - bt_pass))"
+      if [ "$bt_notok" -gt 0 ]; then
+        note_red "bats-tap ($path): the run's own TAP stream has ${bt_notok} not ok (ok ${bt_ok}, of which skip ${bt_skip}; plan 1..${bt_plan})"
+      elif [ "$((bt_ok + bt_notok))" -ne "$bt_plan" ]; then
+        note_red "bats-tap ($path): executed $((bt_ok + bt_notok)) of plan 1..${bt_plan} — the run stopped part-way"
+      fi
+      count="$((bt_ok - bt_skip))"
+      ;;
     python-direct)
       # stdlib unittest prints "Ran N tests in Xs".
       count="$(grep -oE 'Ran [0-9]+ tests?' "$path" | grep -oE '[0-9]+' | tail -1)"
@@ -241,7 +292,7 @@ count_for() {
       count="$tsx_pass"
       ;;
     *)
-      die "unknown runner family: '$runner' (supported: jest vitest playwright playwright-json pytest bats python-direct node node-test tsx bash)"
+      die "unknown runner family: '$runner' (supported: jest vitest playwright playwright-json pytest bats bats-tap python-direct node node-test tsx bash)"
       ;;
   esac
   is_uint "$count" \

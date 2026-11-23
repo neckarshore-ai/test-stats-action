@@ -1,0 +1,6 @@
+1..5
+ok 1 name with # skip inside in 2ms
+ok 2 plain in 1ms # skip
+ok 3 skip with reason in 2ms # skip because
+ok 4 x # skip y in 2ms
+ok 5 x in 2ms # skip y

@@ -1,0 +1,59 @@
+1..58
+ok 1 jest handler counts numPassedTests from a real jest --json report in 47ms
+ok 2 vitest handler counts numPassedTests from a real vitest --reporter=json report in 42ms
+ok 3 playwright handler counts 'Total: N tests' from a real --list text report in 43ms
+ok 4 pytest handler counts 'N tests collected' from a real --collect-only -q report in 45ms
+ok 5 pytest handler counts the SELECTED tests when a run deselects (N/M tests collected) in 43ms
+ok 6 bats handler counts the bare integer from a real bats --count report in 42ms
+ok 7 python-direct handler counts 'Ran N tests' from a real unittest report in 45ms
+ok 8 contract: total equals sum(byType) across mixed runners in 56ms
+ok 9 contract: repo and audited_sha are always present in 52ms
+ok 10 merge-add: two lines of the same type sum into one byType entry in 53ms
+ok 11 lenses are display-only: counted into lenses, NEVER into total or byType in 60ms
+ok 12 endpoints input is included when provided in 46ms
+ok 13 endpoints key is omitted when not provided in 41ms
+ok 14 golden fixture: backend's three jest reports reproduce byType 302/27/255 and total 584 in 72ms
+ok 15 fail-closed: a missing reporter file exits non-zero and writes no stats in 21ms
+ok 16 fail-closed: a jest report without numPassedTests exits non-zero in 23ms
+ok 17 fail-closed: an unknown runner family exits non-zero in 21ms
+ok 18 fail-closed: a malformed runners line (no type) exits non-zero in 19ms
+ok 19 fail-closed: empty runners (no producers) exits non-zero in 22ms
+ok 20 node handler counts 'ok - ' lines from a real node harness report in 42ms
+ok 21 bash handler counts '  ok   - ' lines from a real bash smoke report in 42ms
+ok 22 golden A: md-viewer reproduces total 54 = 8/13/33 disjoint, declared {}, red false in 74ms
+ok 23 golden B: gated 87 total, declared e2e 293 held SEPARATE (never summed) in 69ms
+ok 24 golden C: a red test_result yields red:true + non-null red_detail, file still written in 50ms
+ok 25 declared is display-only: counted into declared, NEVER into total or byType in 58ms
+ok 26 declared is {} when not provided in 41ms
+ok 27 red defaults to false with null red_detail when test_result unset (backward compat) in 45ms
+ok 28 red: a 'success' test_result (any case) is green, red_detail forced null in 46ms
+ok 29 red: a red run with no red_detail synthesizes a non-null detail in 48ms
+ok 30 node-test handler counts the TAP summary from a real node --test report in 48ms
+ok 31 node-test handler counts the spec summary from a real node --test report in 49ms
+ok 32 node-test handler parses the summary, NOT the ok-lines (red fixture: 3 ok-lines, summary pass 3 / fail 1) in 52ms
+ok 33 node-test RED: a run with fail>0 in its own summary emits red:true and STILL writes the file in 56ms
+ok 34 fail-closed: node-test output with no summary at all exits non-zero in 29ms
+ok 35 tsx handler counts a labeled summary line from a real tsx report in 44ms
+ok 36 tsx handler SUMS multiple unlabeled summary lines and ignores interleaved noise in 46ms
+ok 37 tsx RED: a real failing suite emits red:true, counts only the passes, still writes in 54ms
+ok 38 fail-closed: tsx output with no summary line exits non-zero in 23ms
+ok 39 no-silent-zero: a GREEN run parsing 0 tests from non-empty output exits non-zero in 22ms
+ok 40 no-silent-zero: a RED run parsing 0 tests STILL emits (red:true), never dies in 44ms
+ok 41 golden D: goldoni reproduces total 35 = e2e 20 + unit 15 (6 node-test + 9 tsx), red false in 85ms
+ok 42 playwright-json handler counts expected+flaky from a real goldoni JSON report (24) in 49ms
+ok 43 playwright-json count semantics: expected+flaky (4), not expected (3), total-skipped (5) or total (7) in 47ms
+ok 44 playwright-json RED: stats.unexpected>0 emits red:true with the counts even when test_result says success in 52ms
+ok 45 playwright-json RED: a non-empty errors[] (globalTeardown threw, stats all green) emits red:true in 51ms
+ok 46 fail-closed: playwright-json report without .stats exits non-zero, writes nothing in 28ms
+ok 47 fail-closed: playwright-json with .stats.expected missing but flaky>0 exits non-zero (no null+N) in 28ms
+ok 48 fail-closed: playwright-json with string-typed stats exits non-zero (no string concatenation) in 27ms
+ok 49 fail-closed: playwright-json fed non-JSON (e.g. --list text) exits non-zero in 23ms
+ok 50 the existing playwright (--list) family is unchanged by playwright-json in 43ms
+ok 51 bats-tap counts every ok line of a real run of this repo's suite (50) in 53ms
+ok 52 bats-tap does not count a skipped test (3 ok, 1 skip -> 2) in 52ms
+ok 53 RED PROOF bats-tap: a not ok line emits red:true even when test_result says success in 62ms
+ok 54 RED PROOF bats-tap: a run that executed fewer tests than its plan emits red:true in 55ms
+ok 55 fail-closed: bats-tap without a plan line exits non-zero, writes nothing in 24ms
+ok 56 fail-closed: bats-tap fed a bats --count integer exits non-zero (a listing is not a run) in 22ms
+ok 57 bats-tap: a # skip directive is matched case-insensitively, and an ok inside a comment line is not counted in 52ms
+ok 58 the existing bats (--count) family is unchanged by bats-tap in 42ms

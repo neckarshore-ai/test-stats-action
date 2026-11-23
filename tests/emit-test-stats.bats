@@ -526,3 +526,112 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
   [ "$status" -eq 0 ]
   [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 197 ]
 }
+
+# --- bats-tap: the count from the gated run's own TAP stream (planning #4209 step 1) --------
+# Fixtures captured with bats 1.14.0 `--formatter tap -T` on 2026-11-23: this repo's own suite at
+# 0c03741 (58 of 58; a public repo, so no private suite's test names; test 57's name carries
+# "# skip"), three small suites for skip, fail and a run that died part-way (bats: "Executed 2
+# instead of expected 3 tests"), Lenin's names suite timed and untimed, his row-7 skip and a
+# --report-formatter stream. Counted = `ok N` lines that end in the timing ` in Nms`; a skip carries
+# ` in Nms # skip`; a line that is both, or neither, refuses the run. Red = any `not ok`, or
+# executed (ok + not ok) != the plan `1..N`.
+
+@test "bats-tap counts every ok line of a real run of this repo's suite (58, one name carries # skip)" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/test-stats-action-main.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 58 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "bats-tap does not count a skipped test (3 ok, 1 skip -> 2)" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/green-skip.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "RED PROOF bats-tap: a not ok line emits red:true even when test_result says success" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/mixed-red.tap"
+  export INPUT_TEST_RESULT="success"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [[ "$(jq -r '.red_detail' "$OUT")" == *"1 not ok"* ]]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+}
+
+@test "RED PROOF bats-tap: a run that executed fewer tests than its plan emits red:true" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/crashed.tap"
+  export INPUT_TEST_RESULT="success"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [[ "$(jq -r '.red_detail' "$OUT")" == *"executed 2 of plan 1..3"* ]]
+}
+
+@test "fail-closed: bats-tap without a plan line exits non-zero, writes nothing" {
+  printf 'ok 1 a\nok 2 b\n' > "$BATS_TEST_TMPDIR/noplan.tap"
+  export INPUT_RUNNERS="unit:bats-tap:$BATS_TEST_TMPDIR/noplan.tap"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+  [[ "$output" == *"no TAP plan"* ]]
+}
+
+@test "fail-closed: bats-tap fed a bats --count integer exits non-zero (a listing is not a run)" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-count.txt"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+}
+
+@test "bats-tap: a # skip directive is matched case-insensitively, and an ok inside a comment line is not counted" {
+  printf '1..3\nok 1 a in 1ms\nok 2 b in 1ms # SKIP later\n# ok 9 not a result line\nok 3 c in 2ms\n' > "$BATS_TEST_TMPDIR/case.tap"
+  export INPUT_RUNNERS="unit:bats-tap:$BATS_TEST_TMPDIR/case.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "bats-tap: a passing test whose name carries # skip is counted (Lenin on #15), --formatter tap -T" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/names-timed.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "fail-closed: a --report-formatter tap stream is refused, and the message names it (Lenin's re-read, finding 2)" {
+  # bats-format-tap writes ` # in N ms` and no timing on a skip, so a name carrying `# skip`
+  # is ambiguous there again; only the timed `--formatter tap -T` stream is read
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/green-report.tap"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]; [ ! -f "$OUT" ]
+  [[ "$output" == *"--report-formatter"* ]]
+}
+
+@test "fail-closed: a line that reads as a pass and as a skip is refused, never counted (Lenin's row 7)" {
+  # `skip "waits in 5ms"` prints `ok 2 … in 1ms # skip waits in 5ms`: it ends in a timing
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/skip-timing-reason.tap"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]; [ ! -f "$OUT" ]
+  [[ "$output" == *"ambiguous"*"ok 2"* ]]
+}
+
+@test "fail-closed: bats-tap without --timing exits non-zero, writes nothing (a pass and a skip read alike)" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/names-untimed.tap"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+  [[ "$output" == *"--timing"* ]]
+}
+
+@test "the existing bats (--count) family is unchanged by bats-tap" {
+  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 82 ]
+}
