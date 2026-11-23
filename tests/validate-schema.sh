@@ -39,7 +39,7 @@ bash "$SCRIPT" >/dev/null || { echo "validate-schema: sample B emit failed" >&2;
 
 # C — red run (still written).
 INPUT_REPO="owner/repo" INPUT_OUT="$WORK/c.json" \
-INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt" \
+INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json" \
 INPUT_TEST_RESULT="failure" INPUT_RED_DETAIL="1 failed: test_parser_against_real_source" \
 bash "$SCRIPT" >/dev/null || { echo "validate-schema: sample C emit failed" >&2; exit 1; }
 

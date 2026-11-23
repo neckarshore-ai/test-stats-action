@@ -23,7 +23,10 @@ inputs:
       pass ONLY the runner lines your CI actually gates on here; route executed-but-ungated
       or --list-only counts to `declared` instead so the headline never over-counts.
       Format: "type:runner:reporterpath" where runner is one of
-      jest | vitest | playwright | pytest | bats | python-direct | node | node-test | tsx | bash.
+      jest | vitest | playwright-json | pytest-run | bats-tap | python-direct | node | node-test | tsx | bash.
+      v2: the listing families playwright (--list), pytest (--collect-only) and bats (--count)
+      count tests that exist, not tests the run passed; they are refused here and in `lenses`
+      and belong in `declared`.
       (node/bash count TAP-lite "ok - <label>" lines from the runner's own output.
       node-test parses the `node --test` SUMMARY — both the TAP "# pass N" shape (node 20)
       and the spec "i pass N" shape (node 22+) — never its ok-lines, which double-count

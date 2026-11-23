@@ -360,6 +360,18 @@ accumulate() {
     path="$(trim "${rest#*:}")"
     [ -n "$type" ] || die "malformed line (empty type): '$line'"
     [ -n "$path" ] || die "malformed line (empty reporter path): '$line'"
+    # v2 (planning #4209, AD-66 Z7): a listing counts tests that exist, not tests the gated run
+    # passed, so the listing families feed `declared:` only, never `runners:` (and so never
+    # `total`) and never `lenses:` (a subset of what ran). No producer had one in lenses
+    # (measured over the 17 producer workflows, 2026-11-23)
+    if [ -n "${NO_LISTING:-}" ]; then
+      case $runner in
+        playwright|pytest|bats)
+          local twin
+          case $runner in playwright) twin=playwright-json;; pytest) twin=pytest-run;; bats) twin=bats-tap;; esac
+          die "runner '$runner' is a listing (it counts tests that exist, not tests the run passed): in v2 it belongs in declared:, or read the gated run's own report with '$twin' ('$line')" ;;
+      esac
+    fi
     count="$(count_for "$runner" "$path")" || exit 1
     bucket="$(jq -c --arg t "$type" --argjson c "$count" '.[$t] = ((.[$t] // 0) + $c)' <<<"$bucket")" \
       || die "failed to merge count for type '$type'"
@@ -399,7 +411,9 @@ trap 'rm -f "$RED_FLAGS_FILE"' EXIT
 # suites there (oakwood's search:unit, #257). Letting those force red:true would paint a
 # repo whose actual gate is green as red, permanently.
 DETECT_RED=1
+NO_LISTING=1
 byType="$(accumulate '{}' "$INPUT_RUNNERS")" || exit 1
+NO_LISTING=""
 DETECT_RED=""
 [ "$(jq 'length' <<<"$byType")" -gt 0 ] \
   || die "no runners provided — a producer with zero runner totals is a fail-closed error, not a silent empty stats.json"
@@ -410,7 +424,9 @@ DETECT_RED=""
 declared="$(accumulate '{}' "$INPUT_DECLARED")" || exit 1
 
 # --- lenses (overlapping subsets — display-only, NEVER summed into total/byType) ---
+NO_LISTING=1
 lenses="$(accumulate '{}' "$INPUT_LENSES")" || exit 1
+NO_LISTING=""
 
 # --- total = sum(byType); lenses AND declared deliberately excluded ---
 total="$(jq -n --argjson b "$byType" '[$b[]] | add // 0')" || die "failed to compute total"
@@ -437,7 +453,7 @@ sha="$INPUT_SHA"
 updatedAt="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 # --- assemble the contract object ---
-# key order: repo, audited_sha, red, red_detail, tests{total,byType,declared,lenses}, [endpoints], updatedAt
+# key order: repo, audited_sha, red, red_detail, tests{total,counting,byType,declared,lenses}, [endpoints], updatedAt
 result="$(jq -n \
   --arg repo "$INPUT_REPO" \
   --arg sha "$sha" \
@@ -449,7 +465,7 @@ result="$(jq -n \
   --argjson declared "$declared" \
   --argjson lenses "$lenses" \
   '{repo:$repo, audited_sha:$sha, red:$red, red_detail:(if $red then $red_detail else null end),
-    tests:{total:$total, byType:$byType, declared:$declared, lenses:$lenses}, updatedAt:$updated}')" \
+    tests:{total:$total, counting:"passed", byType:$byType, declared:$declared, lenses:$lenses}, updatedAt:$updated}')" \
   || die "failed to assemble stats object"
 
 if [ -n "$INPUT_ENDPOINTS" ]; then

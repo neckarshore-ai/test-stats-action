@@ -24,17 +24,17 @@ Run your suite, point the action at the reporter output:
 - uses: actions/checkout@v5            # required: audited_sha = git rev-parse HEAD
   # ... install + run your suites, emitting each runner's native reporter to a file ...
 
-- uses: neckarshore-ai/test-stats-action@v1
+- uses: neckarshore-ai/test-stats-action@v2
   with:
     repo: ${{ github.repository }}     # owner/name (default: the current repo)
     out: stats.json                    # where to write (the repo's statsPath)
     runners: |                         # GATED, disjoint runner totals -> byType (additive) -> total
       unit:vitest:reports/vitest.json
-      e2e:playwright:reports/pw-list.txt
+      e2e:playwright-json:reports/pw.json
     declared: |                        # optional: executed-but-UNGATED / --list-only -> tests.declared, NEVER in total
       e2e:playwright:reports/ungated-e2e-list.txt
     lenses: |                          # optional: overlapping subsets -> display-only, NEVER summed
-      accessibility:playwright:reports/a11y-list.txt
+      accessibility:playwright-json:reports/a11y.json
     endpoints: '96'                    # optional: API count for the tile facet (omitted if empty)
     test_result: ${{ job.status }}     # optional: non-green => red:true (file still written)
 ```
@@ -92,6 +92,8 @@ child's assertions.
 
 Each handler parses **only** that runner's own reporter format. Produce the reporter
 file in your CI, then name it in a `runners:` line.
+
+> **Important:** **v2 (planning #4209, AD-66 Z7): the three listing families `playwright`, `pytest` and `bats` are accepted in `declared:` only.** A listing counts the tests that exist, not the tests the gated run passed. In `runners:` and `lenses:` they stop the action with a message that names the run twin: `playwright-json`, `pytest-run` or `bats-tap`. Every v2 `stats.json` carries `tests.counting: "passed"` (Lenin's contract row on #4209). A v1 pin keeps working unchanged; the bump is the migration.
 
 | Runner | How to produce the reporter file | What the handler reads |
 |--------|----------------------------------|------------------------|
