@@ -62,6 +62,7 @@ jobs:
             and .tests.byType.integration == 13
             and .tests.byType.e2e == 33
             and .tests.declared == {}
+            and .tests.counting == "passed"
             and .red == false
             and (.audited_sha | type == "string" and length > 0)
           ' self-test-stats.json > /dev/null \

@@ -42,33 +42,37 @@ setup() {
 }
 
 @test "playwright handler counts 'Total: N tests' from a real --list text report" {
-  export INPUT_RUNNERS="e2e:playwright:$FIX/playwright-list.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  export INPUT_DECLARED="e2e:playwright:$FIX/playwright-list.txt"   # v2: a listing family is declared only
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 197 ]
+  [ "$(jq '.tests.declared.e2e' "$OUT")" -eq 197 ]
 }
 
 @test "pytest handler counts 'N tests collected' from a real --collect-only -q report" {
-  export INPUT_RUNNERS="unit:pytest:$FIX/pytest-collect.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  export INPUT_DECLARED="unit:pytest:$FIX/pytest-collect.txt"   # v2: a listing family is declared only
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 5 ]
+  [ "$(jq '.tests.declared.unit' "$OUT")" -eq 5 ]
 }
 
 @test "pytest handler counts the SELECTED tests when a run deselects (N/M tests collected)" {
   # pytest -m/-k/--deselect prints "4/6 tests collected (2 deselected)"; the 2
   # deselected tests never run in CI, so they must not be counted as gated (#11).
-  export INPUT_RUNNERS="unit:pytest:$FIX/pytest-collect-deselected.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  export INPUT_DECLARED="unit:pytest:$FIX/pytest-collect-deselected.txt"   # v2: a listing family is declared only
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 4 ]
+  [ "$(jq '.tests.declared.unit' "$OUT")" -eq 4 ]
 }
 
 @test "bats handler counts the bare integer from a real bats --count report" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  export INPUT_DECLARED="unit:bats:$FIX/bats-count.txt"   # v2: a listing family is declared only
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 82 ]
+  [ "$(jq '.tests.declared.unit' "$OUT")" -eq 82 ]
 }
 
 @test "python-direct handler counts 'Ran N tests' from a real unittest report" {
@@ -82,15 +86,15 @@ setup() {
 
 @test "contract: total equals sum(byType) across mixed runners" {
   export INPUT_RUNNERS="unit:jest:$FIX/jest-report.json
-e2e:playwright:$FIX/playwright-list.txt"
+e2e:bats-tap:$FIX/bats-tap/green-skip.tap"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.total' "$OUT")" -eq 224 ]            # 27 + 197
+  [ "$(jq '.tests.total' "$OUT")" -eq 29 ]             # 27 + 2
   [ "$(jq '.tests.total == ([.tests.byType[]] | add)' "$OUT")" = "true" ]
 }
 
 @test "contract: repo and audited_sha are always present" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$(jq -r '.repo' "$OUT")" = "owner/repo" ]
@@ -120,7 +124,7 @@ unit:vitest:$FIX/vitest-report.json"
 }
 
 @test "endpoints input is included when provided" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   export INPUT_ENDPOINTS="96"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
@@ -128,7 +132,7 @@ unit:vitest:$FIX/vitest-report.json"
 }
 
 @test "endpoints key is omitted when not provided" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$(jq 'has("endpoints")' "$OUT")" = "false" ]
@@ -241,7 +245,7 @@ unit:python-direct:$FIX/unittest-output.txt"
 # ---- golden fixture C: red run still writes ----
 
 @test "golden C: a red test_result yields red:true + non-null red_detail, file still written" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   export INPUT_TEST_RESULT="failure"
   export INPUT_RED_DETAIL="1 failed: test_parser_against_real_source"
   run bash "$SCRIPT"
@@ -249,7 +253,7 @@ unit:python-direct:$FIX/unittest-output.txt"
   [ -f "$OUT" ]                                          # STILL written on red (WARN, not blind)
   [ "$(jq '.red' "$OUT")" = "true" ]
   [ "$(jq -r '.red_detail' "$OUT")" = "1 failed: test_parser_against_real_source" ]
-  [ "$(jq '.tests.total' "$OUT")" -eq 82 ]              # the count is still emitted for the WARN
+  [ "$(jq '.tests.total' "$OUT")" -eq 85 ]              # the count is still emitted for the WARN
 }
 
 # ---- declared + red invariants ----
@@ -265,14 +269,14 @@ unit:python-direct:$FIX/unittest-output.txt"
 }
 
 @test "declared is {} when not provided" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$(jq '.tests.declared' "$OUT")" = "{}" ]
 }
 
 @test "red defaults to false with null red_detail when test_result unset (backward compat)" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$(jq '.red' "$OUT")" = "false" ]
@@ -280,7 +284,7 @@ unit:python-direct:$FIX/unittest-output.txt"
 }
 
 @test "red: a 'success' test_result (any case) is green, red_detail forced null" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   export INPUT_TEST_RESULT="SUCCESS"
   export INPUT_RED_DETAIL="ignored on green"
   run bash "$SCRIPT"
@@ -290,7 +294,7 @@ unit:python-direct:$FIX/unittest-output.txt"
 }
 
 @test "red: a red run with no red_detail synthesizes a non-null detail" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   export INPUT_TEST_RESULT="failure"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
@@ -423,19 +427,18 @@ unit:python-direct:$FIX/unittest-output.txt"
 # CI-gated unit half (unit.yml: lighthouse 6 + search 9) fell silently on the floor
 # because neither runner had an adapter. This test is what proves the gap is closed.
 
-@test "golden D: goldoni reproduces total 35 = e2e 20 + unit 15 (6 node-test + 9 tsx), red false" {
+@test "golden D (v2): goldoni counts unit 15 from runs (6 node-test + 9 tsx); its e2e listing 20 is declared" {
   export INPUT_REPO="neckarshore-websites/goldoni-website"
-  export INPUT_RUNNERS="e2e:playwright:$FIX/goldoni/e2e-list.out
-unit:node-test:$FIX/goldoni/lighthouse-unit-tap.out
+  export INPUT_DECLARED="e2e:playwright:$FIX/goldoni/e2e-list.out"
+  export INPUT_RUNNERS="unit:node-test:$FIX/goldoni/lighthouse-unit-tap.out
 unit:tsx:$FIX/goldoni/search-index-data.out"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 20 ]
+  [ "$(jq '.tests.declared.e2e' "$OUT")" -eq 20 ]
   [ "$(jq '.tests.byType.unit' "$OUT")" -eq 15 ]
-  [ "$(jq '.tests.total' "$OUT")" -eq 35 ]
+  [ "$(jq '.tests.total' "$OUT")" -eq 15 ]
   [ "$(jq '.tests.total' "$OUT")" -eq "$(jq '[.tests.byType[]] | add' "$OUT")" ]
   [ "$(jq -r '.red' "$OUT")" = "false" ]
-  [ "$(jq -c '.tests.declared' "$OUT")" = "{}" ]
 }
 
 # ---- playwright-json: the Playwright JSON reporter (a FORMAT-named family, tsa#8) ----
@@ -521,10 +524,11 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
 }
 
 @test "the existing playwright (--list) family is unchanged by playwright-json" {
-  export INPUT_RUNNERS="e2e:playwright:$FIX/playwright-list.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  export INPUT_DECLARED="e2e:playwright:$FIX/playwright-list.txt"   # v2: a listing family is declared only
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.e2e' "$OUT")" -eq 197 ]
+  [ "$(jq '.tests.declared.e2e' "$OUT")" -eq 197 ]
 }
 
 # --- bats-tap: the count from the gated run's own TAP stream (planning #4209 step 1) --------
@@ -630,10 +634,11 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
 }
 
 @test "the existing bats (--count) family is unchanged by bats-tap" {
-  export INPUT_RUNNERS="unit:bats:$FIX/bats-count.txt"
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  export INPUT_DECLARED="unit:bats:$FIX/bats-count.txt"   # v2: a listing family is declared only
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 82 ]
+  [ "$(jq '.tests.declared.unit' "$OUT")" -eq 82 ]
 }
 
 # --- pytest-run: the count from the gated run's own JUnit XML (planning #4209 step 1) ----------
@@ -686,4 +691,42 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
   export INPUT_RUNNERS="unit:pytest-run:$BATS_TEST_TMPDIR/cut.xml"
   run bash "$SCRIPT"
   [ "$status" -ne 0 ]; [ ! -f "$OUT" ]
+}
+
+# --- v2 (planning #4209 step 1): a listing is no count of tests that ran -----------------------
+# The design accepted on #4209: the listing families (playwright --list, pytest --collect-only,
+# bats --count) are allowed in `declared:` only; in `runners:` they die and name the run twin.
+# `lenses:` are display-only like `declared:` and keep them (Bob's reading, named in the PR).
+# Every stats.json carries tests.counting "passed" (Lenin's contract row, #4209 comment 7084777394).
+
+@test "v2: a listing family in runners dies, names its run twin, writes nothing" {
+  local fam twin fx
+  for fam in "playwright:playwright-json:playwright-list.txt" "pytest:pytest-run:pytest-collect.txt" "bats:bats-tap:bats-count.txt"; do
+    IFS=: read -r fam twin fx <<<"$fam"
+    rm -f "$OUT"
+    export INPUT_RUNNERS="unit:$fam:$FIX/$fx"
+    run bash "$SCRIPT"
+    [ "$status" -ne 0 ] || { echo "$fam in runners did not die"; return 1; }
+    [ ! -f "$OUT" ]
+    [[ "$output" == *"'$fam' is a listing"*"$twin"* ]] || { echo "$fam: $output"; return 1; }
+  done
+}
+
+@test "v2: a listing family is still read in declared and in lenses" {
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  export INPUT_DECLARED="e2e:playwright:$FIX/playwright-list.txt"
+  export INPUT_LENSES="accessibility:bats:$FIX/bats-count.txt"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.total' "$OUT")" -eq 85 ]
+  [ "$(jq '.tests.declared.e2e' "$OUT")" -eq 197 ]
+  [ "$(jq '.tests.lenses.accessibility' "$OUT")" -eq 82 ]
+}
+
+@test "v2: tests.counting is \"passed\", right after tests.total" {
+  export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq -r '.tests.counting' "$OUT")" = "passed" ]
+  [ "$(jq -c '.tests | keys_unsorted' "$OUT")" = '["total","counting","byType","declared","lenses"]' ]
 }
