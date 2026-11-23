@@ -170,6 +170,55 @@ file in your CI, then name it in a `runners:` line.
 > twice — exactly as its `--list` `Total:` line does (goldoni @`77d8b72`: `--list` 24, JSON 24).
 > *Proposal, pending review by the test-governance steward.*
 
+## Check (c): a gated suite nobody configured
+
+From v2 the action runs a second step **after** `stats.json` is written: it reads this
+repo's `.github/workflows/*.yml` and names every test-runner invocation whose output the
+action was not told about ([planning #4209](https://github.com/neckarshore-ai/neckarshore-planning/issues/4209), section 6).
+
+**What it names:** a test-runner invocation in a `run:` block, or one level down in a
+`package.json` script that block calls (`npm test`, `npm run x`, `pnpm x`, `yarn x`), whose
+output file is named in none of `runners:`, `declared:` or `lenses:`, in a step that carries
+no `# test-stats: uncounted <reason>` marker. Runners, in command position only: `jest`,
+`vitest`, `playwright test`, `pytest` (also `python -m pytest`, `uv run pytest`), `bats`,
+`node --test`, `tsx`. An install, a `--version` call or a mention inside `echo` is no run.
+
+**When an output counts as named:** a configured path, in full or by its file name as a
+whole word, appears in the invocation's line, in the step's `env:` block, or in the
+`package.json` script; or the line writes a file (`> f`, `>> f`, `tee f`) that another line
+of the same step turns into a configured file (a TAP stream reduced to the counted file).
+Measured on the 17 producers on 2026-11-23: matching per step instead would hide a second,
+uncounted runner in a multi-runner emit step; matching per line alone flags the two
+derivation steps (dev-environment `stats.yml`, site-quality `ci.yml`).
+
+**The marker** is the only escape, per step: a YAML comment in the step, in the comment
+block right above its `-`, or a shell comment inside its `run:` block. The reason is
+required; `# test-stats: uncounted` alone does not count and the warning says so.
+
+```yaml
+      # test-stats: uncounted a monitor against production, not a gate
+      - run: npx playwright test --project=prod
+```
+
+**Mode:** warn-only until the binding date: each finding is a `::warning::` annotation with
+file and line, and the full list goes to the step summary. The step exits 0 on every path,
+including the check's own failure (shown as a warning). From the binding date it fails.
+The switch is internal, not an input, so the marker stays the only per-step escape.
+
+**Does not catch** (section 6 of #4209, verbatim):
+
+1. runners invoked through shell scripts or Makefiles deeper than one level,
+2. runner binaries outside the pattern list (jest, vitest, playwright, pytest, bats, `node --test`, tsx),
+3. producers still on v1. Before the binding date it is a naming layer.
+
+Added by the reader itself:
+
+4. a second runner on the **same line** as a configured path (the line counts as named),
+5. a `cd` built at run time (`cd "$DIR"`), a `npm --workspace` call, or a working directory
+   the reader cannot resolve: the `package.json` lookup is skipped and counted in the summary,
+6. a heredoc body in a `run:` block is read as shell lines, and a YAML flow form
+   (`run: >` folded across lines, anchors) is read line by line.
+
 ## Contract guarantees (enforced by the fixture tests + schema)
 
 1. **Runner-reported, never grep** — one handler per runner, parsing the runner's own output.
@@ -283,8 +332,9 @@ Three **golden conformance fixtures**:
 
 ```bash
 npm install -g bats@1.13.0 ajv-cli@5.0.0   # pinned, exact
-bats tests/emit-test-stats.bats            # counts + contract invariants (49 tests)
-shellcheck emit-test-stats.sh tests/validate-schema.sh
+bats tests/emit-test-stats.bats            # counts + contract invariants
+bats tests/check-uncounted.bats            # check (c)
+shellcheck emit-test-stats.sh check-uncounted.sh tests/validate-schema.sh
 bash tests/validate-schema.sh              # emitted stats.json validates against tests/stats.schema.json
 ```
 

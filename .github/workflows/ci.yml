@@ -21,10 +21,13 @@ jobs:
         run: sudo npm install -g bats@1.13.0 ajv-cli@5.0.0
 
       - name: Shellcheck the transform core + helpers
-        run: shellcheck emit-test-stats.sh tests/validate-schema.sh
+        run: shellcheck emit-test-stats.sh check-uncounted.sh tests/validate-schema.sh
 
       - name: Run fixture tests (11 runner families + contract invariants + golden A/B/C/D + red/declared/no-silent-zero)
         run: bats tests/emit-test-stats.bats
+
+      - name: Run check (c) tests (uncounted runner invocations, planning #4209 section 6)
+        run: bats tests/check-uncounted.bats
 
       - name: Validate emitted stats.json against the hardened contract schema
         run: bash tests/validate-schema.sh
