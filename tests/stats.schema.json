@@ -28,12 +28,17 @@
     "tests": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["total", "byType", "declared", "lenses"],
+      "required": ["total", "counting", "byType", "declared", "lenses"],
       "properties": {
         "total": {
           "type": "integer",
           "minimum": 0,
           "description": "Executed AND CI-gated AND disjoint = sum(values of byType). Never includes declared or lenses."
+        },
+        "counting": {
+          "type": "string",
+          "minLength": 1,
+          "description": "How tests.total was counted. Today one value, \"passed\": from the gated run (AD-66 Z7). Value set open (planning #4209, Lenin's contract row)."
         },
         "byType": {
           "type": "object",
