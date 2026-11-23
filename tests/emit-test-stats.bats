@@ -635,3 +635,55 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
   [ "$status" -eq 0 ]
   [ "$(jq '.tests.byType.unit' "$OUT")" -eq 82 ]
 }
+
+# --- pytest-run: the count from the gated run's own JUnit XML (planning #4209 step 1) ----------
+# Fixtures: real pytest 9.2.0 `--junitxml` from the authored suites in tests/fixtures/pytest-run/
+# authored/ (captured 2026-11-23; hostname, timestamp and the local path normalised). Rules:
+# MASCHIN's correction 1 and Lenin's table on #4209 (2026-11-22). Counted: a plain testcase (a
+# pass, also a non-strict XPASS) and <skipped type="pytest.xfail">. Not counted: any other
+# <skipped>. Red: any <failure> or <error> (a strict XPASS is a failure, Z7 item 4).
+
+@test "pytest-run counts pass, xfail and non-strict XPASS, not a skip (Lenin's table: 4 cases -> 3)" {
+  export INPUT_RUNNERS="unit:pytest-run:$FIX/pytest-run/green.xml"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 3 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "RED PROOF pytest-run: a failure, a strict XPASS and a fixture error emit red:true even when test_result says success" {
+  export INPUT_RUNNERS="unit:pytest-run:$FIX/pytest-run/red.xml"
+  export INPUT_TEST_RESULT="success"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [[ "$(jq -r '.red_detail' "$OUT")" == *"2 failure(s), 1 error(s)"* ]]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 1 ]
+}
+
+@test "RED PROOF pytest-run: a collection error (nothing of the module ran) emits red:true" {
+  export INPUT_RUNNERS="unit:pytest-run:$FIX/pytest-run/collect-error.xml"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 0 ]
+}
+
+@test "pytest-run reads every testcase of a two-file run (2 pass + xfail + xpass = 4, red)" {
+  export INPUT_RUNNERS="unit:pytest-run:$FIX/pytest-run/mixed-two-files.xml"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 4 ]
+  [ "$(jq -r '.red' "$OUT")" = "true" ]
+}
+
+@test "fail-closed: pytest-run fed a --collect-only listing or a truncated XML exits non-zero, writes nothing" {
+  export INPUT_RUNNERS="unit:pytest-run:$FIX/pytest-collect.txt"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]; [ ! -f "$OUT" ]
+  [[ "$output" == *"JUnit XML"* ]]
+  head -c 300 "$FIX/pytest-run/green.xml" > "$BATS_TEST_TMPDIR/cut.xml"
+  export INPUT_RUNNERS="unit:pytest-run:$BATS_TEST_TMPDIR/cut.xml"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]; [ ! -f "$OUT" ]
+}

@@ -94,7 +94,7 @@ note_red() {
 #     exact class this action exists to prevent. Empirically live: omnopsis-contracts'
 #     dist-smoke prints a '✓ ...' line that the ok-line adapters count as 0.
 #
-#   RED run + 0 -> ALLOWED, never dies. A crashed/aborted suite legitimately reports
+#   RED run + 0 -> ALLOWED, never dies (red from test_result or from the runner's own report). A crashed/aborted suite legitimately reports
 #     nothing, and red:true already carries the warning. Dying here would suppress the
 #     emit exactly when the aggregator most needs the signal — fail-closed-VISIBLE
 #     means the number stays visible AND flagged, not that the file disappears.
@@ -102,6 +102,9 @@ zero_guard() {
   local runner="$1" path="$2" count="$3"
   [ "$count" -eq 0 ] || return 0
   [ "${red:-false}" = "true" ] && return 0
+  # a runner's own report that already flagged red (note_red) is a red run as well: a module
+  # that failed to import reports 0 tests and an error, and red:true carries that (pytest-run)
+  [ -n "${RED_FLAGS_FILE:-}" ] && [ -s "$RED_FLAGS_FILE" ] && return 0
   die "runner '$runner': parsed 0 tests from non-empty reporter output at $path — refusing to emit a silent zero on a green run. Either this runner family cannot parse that reporter, or the suite never ran."
 }
 
@@ -222,6 +225,48 @@ count_for() {
       fi
       count="$((bt_ok - bt_skip))"
       ;;
+    pytest-run)
+      # The gated pytest run's OWN JUnit XML (`pytest --junitxml=r.xml`, built in, no plugin).
+      # planning #4209 step 1, MASCHIN's correction 1: the runner's machine format, never the
+      # summary line and never `--collect-only` (a listing, see `pytest` above). Per testcase,
+      # measured on pytest 9.2.0 (tests/fixtures/pytest-run/) and Lenin's table on #4209:
+      #   counted = a testcase with no child (a pass; a non-strict XPASS is written the same way)
+      #             or with <skipped type="pytest.xfail"> (an expected failure, Z7 item 3)
+      #   skipped = any other <skipped> (not counted)
+      #   red     = any <failure> or <error>: a failed test, a strict XPASS (Z7 item 4), a fixture
+      #             error, or a module that failed to import (pytest's collection error)
+      # A file that does not parse as JUnit XML is a refusal: a truncated report or a listing.
+      local pr_out pr_count pr_fail pr_err pr_skip
+      command -v python3 >/dev/null 2>&1 \
+        || die "runner 'pytest-run': python3 is needed to read the JUnit XML and is not on PATH"
+      pr_out="$(python3 -I -c '
+import sys, xml.etree.ElementTree as ET
+try:
+    root = ET.parse(sys.argv[1]).getroot()
+except Exception as e:
+    print("ERR", e); sys.exit(0)
+if root.tag not in ("testsuites", "testsuite"):
+    print("ERR root element <%s>" % root.tag); sys.exit(0)
+c = f = e = k = 0
+for tc in root.iter("testcase"):
+    kids = [x.tag for x in tc]
+    if "failure" in kids: f += 1
+    elif "error" in kids: e += 1
+    elif "skipped" in kids:
+        if any(x.tag == "skipped" and x.get("type") == "pytest.xfail" for x in tc): c += 1
+        else: k += 1
+    else: c += 1
+print(c, f, e, k)
+' "$path")"
+      case $pr_out in
+        ERR*) die "runner 'pytest-run': $path is not a JUnit XML report (${pr_out#ERR }) — is this really \`pytest --junitxml\` output? (a \`--collect-only\` listing belongs to the \`pytest\` family)" ;;
+      esac
+      read -r pr_count pr_fail pr_err pr_skip <<<"$pr_out"
+      if [ "$((pr_fail + pr_err))" -gt 0 ]; then
+        note_red "pytest-run ($path): the run's own JUnit XML has ${pr_fail} failure(s), ${pr_err} error(s) (counted ${pr_count}, skipped ${pr_skip})"
+      fi
+      count="$pr_count"
+      ;;
     python-direct)
       # stdlib unittest prints "Ran N tests in Xs".
       count="$(grep -oE 'Ran [0-9]+ tests?' "$path" | grep -oE '[0-9]+' | tail -1)"
@@ -292,7 +337,7 @@ count_for() {
       count="$tsx_pass"
       ;;
     *)
-      die "unknown runner family: '$runner' (supported: jest vitest playwright playwright-json pytest bats bats-tap python-direct node node-test tsx bash)"
+      die "unknown runner family: '$runner' (supported: jest vitest playwright playwright-json pytest pytest-run bats bats-tap python-direct node node-test tsx bash)"
       ;;
   esac
   is_uint "$count" \
