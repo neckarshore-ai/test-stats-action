@@ -101,7 +101,7 @@ file in your CI, then name it in a `runners:` line.
 | `playwright-json` | `PLAYWRIGHT_JSON_OUTPUT_FILE=r.json playwright test --reporter=json` | top-level `.stats`: `expected + flaky`; `unexpected > 0` or a non-empty `errors[]` → `red:true` |
 | `pytest` | `pytest --collect-only -q > r.txt` | the `N tests collected` summary line; with a deselection (`S/N tests collected (D deselected)`) the selected `S` |
 | `bats` | `bats --count tests/ > r.txt` | the bare integer |
-| `bats-tap` | `bats --formatter tap tests/ > r.tap` (or `--report-formatter tap -o <dir>` beside the pretty output) | `ok N` lines without a `# skip` directive; any `not ok`, or executed ≠ the plan `1..N` (a run that died part-way) → `red:true`; no plan line → refused |
+| `bats-tap` | `bats --formatter tap --timing tests/ > r.tap` (or `--timing --report-formatter tap -o <dir>` beside the pretty output); **`--timing` (`-T`) is required** | `ok N` lines that end in the timing ` in Nms` (bats does not escape `#` in a test name, so only the timing tells a pass named `x # skip y` from a skipped `x`); a run without timing → refused; any `not ok`, or executed ≠ the plan `1..N` (a run that died part-way) → `red:true`; no plan line → refused |
 | `python-direct` | `python -m unittest ... > r.txt 2>&1` | the `Ran N tests` summary line |
 | `node` | `node your-test.mjs > r.txt` | count of TAP-lite `ok - <label>` lines (a hand-rolled Node harness) |
 | `node-test` | `node --test path/to/*.test.mjs > r.txt 2>&1` | the `node --test` **summary**: `# pass N` (TAP) or `ℹ pass N` (spec) |
@@ -199,10 +199,11 @@ passes here and fails live. Sources (captured 2026-06-21):
 | Fixture | Source | Count |
 |---------|--------|-------|
 | `bats-count.txt` | `dev-environment` `bats --count tests/` | 82 |
-| `bats-tap/test-stats-action-main.tap` | this repo @`c019cb2` `bats --formatter tap tests/emit-test-stats.bats`, bats 1.14.0 (captured 2026-11-22) | 50 |
-| `bats-tap/green-skip.tap` | authored suite [`bats-tap/authored/green.bats`](tests/fixtures/bats-tap/authored/green.bats), real `--formatter tap` output, bats 1.14.0 (captured 2026-11-22) | 3 ok, 1 of them skip → **2** |
-| `bats-tap/mixed-red.tap` | authored suite [`bats-tap/authored/mixed.bats`](tests/fixtures/bats-tap/authored/mixed.bats), same capture; the failure comment's temp path replaced by `/tmp/mixed.bats` | 2 counted, 1 skip, 1 not ok → **2**, red |
+| `bats-tap/test-stats-action-main.tap` | this repo @`0c03741` `bats --formatter tap -T tests/`, bats 1.14.0 (captured 2026-11-23); test 57's name carries `# skip` | 58 |
+| `bats-tap/green-skip.tap` | authored suite [`bats-tap/authored/green.bats`](tests/fixtures/bats-tap/authored/green.bats), real `--formatter tap -T` output, bats 1.14.0 (captured 2026-11-23) | 3 ok, 1 of them skip → **2** |
+| `bats-tap/mixed-red.tap` | authored suite [`bats-tap/authored/mixed.bats`](tests/fixtures/bats-tap/authored/mixed.bats), same capture, run from its own directory (no temp path in the failure comment) | 2 counted, 1 skip, 1 not ok → **2**, red |
 | `bats-tap/crashed.tap` | authored suite [`bats-tap/authored/crash.bats`](tests/fixtures/bats-tap/authored/crash.bats) (test 2 kills its runner), same capture; bats prints "Executed 2 instead of expected 3 tests" | 2 executed of plan 3 → **2**, red |
+| `bats-tap/names-timed.tap`, `names-timed-report.tap`, `names-untimed.tap` | authored suite [`bats-tap/authored/names.bats`](tests/fixtures/bats-tap/authored/names.bats) (Lenin on #15: two passing tests whose names carry `# skip`, three skips), through `--formatter tap -T`, `-T --report-formatter tap` and `--formatter tap`, bats 1.14.0 (captured 2026-11-23) | **2**, **2**, refused |
 | `golden/{unit,integration,e2e}.json` | `omnopsis-backend` three suites (real summaries) | 302 / 27 / 255 → **584** |
 | `goldoni/e2e-list.out` | `goldoni-website` @`401cdf5` `playwright test --grep-invert @external --list` (captured 2026-07-17) | 20 |
 | `goldoni/lighthouse-unit-spec.out` | `goldoni-website` @`401cdf5` `node --test --test-reporter=spec scripts/lighthouse-profiles.test.mjs` (captured 2026-07-17) | 6 |

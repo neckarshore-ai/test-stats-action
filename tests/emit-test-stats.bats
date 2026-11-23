@@ -528,16 +528,17 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
 }
 
 # --- bats-tap: the count from the gated run's own TAP stream (planning #4209 step 1) --------
-# Fixtures captured with bats 1.14.0 `--formatter tap` on 2026-11-22: this repo's own suite on
-# main c019cb2 (50 of 50; a public repo, so no private suite's test names) and three small suites for skip, fail and a run that
-# died part-way (bats: "Executed 2 instead of expected 3 tests"). Counted = `ok N` lines without
-# a `# skip` directive. Red = any `not ok`, or executed (ok + not ok) != the plan `1..N`.
+# Fixtures captured with bats 1.14.0 `--formatter tap -T` on 2026-11-23: this repo's own suite at
+# 0c03741 (58 of 58; a public repo, so no private suite's test names; test 57's name carries
+# "# skip"), three small suites for skip, fail and a run that died part-way (bats: "Executed 2
+# instead of expected 3 tests"), and Lenin's names suite in three formats. Counted = `ok N` lines
+# that end in the timing ` in Nms`. Red = any `not ok`, or executed (ok + not ok) != the plan `1..N`.
 
-@test "bats-tap counts every ok line of a real run of this repo's suite (50)" {
+@test "bats-tap counts every ok line of a real run of this repo's suite (58, one name carries # skip)" {
   export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/test-stats-action-main.tap"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 50 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 58 ]
   [ "$(jq -r '.red' "$OUT")" = "false" ]
 }
 
@@ -585,12 +586,35 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
 }
 
 @test "bats-tap: a # skip directive is matched case-insensitively, and an ok inside a comment line is not counted" {
-  printf '1..3\nok 1 a\nok 2 b # SKIP later\n# ok 9 not a result line\nok 3 c\n' > "$BATS_TEST_TMPDIR/case.tap"
+  printf '1..3\nok 1 a in 1ms\nok 2 b in 1ms # SKIP later\n# ok 9 not a result line\nok 3 c in 2ms\n' > "$BATS_TEST_TMPDIR/case.tap"
   export INPUT_RUNNERS="unit:bats-tap:$BATS_TEST_TMPDIR/case.tap"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
   [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "bats-tap: a passing test whose name carries # skip is counted (Lenin on #15), --formatter tap -T" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/names-timed.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+  [ "$(jq -r '.red' "$OUT")" = "false" ]
+}
+
+@test "bats-tap: the same suite through --report-formatter tap -T (timing on passes only) counts the same" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/names-timed-report.tap"
+  run bash "$SCRIPT"
+  [ "$status" -eq 0 ]
+  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+}
+
+@test "fail-closed: bats-tap without --timing exits non-zero, writes nothing (a pass and a skip read alike)" {
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/names-untimed.tap"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]
+  [ ! -f "$OUT" ]
+  [[ "$output" == *"--timing"* ]]
 }
 
 @test "the existing bats (--count) family is unchanged by bats-tap" {
