@@ -114,13 +114,13 @@ unit:vitest:$FIX/vitest-report.json"
 
 @test "lenses are display-only: counted into lenses, NEVER into total or byType" {
   export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
-  export INPUT_LENSES="accessibility:playwright:$FIX/playwright-list.txt"
+  export INPUT_LENSES="accessibility:bats-tap:$FIX/bats-tap/green-skip.tap"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
-  [ "$(jq '.tests.total' "$OUT")" -eq 85 ]             # lens 197 excluded
+  [ "$(jq '.tests.total' "$OUT")" -eq 85 ]             # lens 2 excluded
   [ "$(jq '.tests.byType.unit' "$OUT")" -eq 85 ]
   [ "$(jq '.tests.byType | has("accessibility")' "$OUT")" = "false" ]
-  [ "$(jq '.tests.lenses.accessibility' "$OUT")" -eq 197 ]
+  [ "$(jq '.tests.lenses.accessibility' "$OUT")" -eq 2 ]
 }
 
 @test "endpoints input is included when provided" {
@@ -696,7 +696,7 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
 # --- v2 (planning #4209 step 1): a listing is no count of tests that ran -----------------------
 # The design accepted on #4209: the listing families (playwright --list, pytest --collect-only,
 # bats --count) are allowed in `declared:` only; in `runners:` they die and name the run twin.
-# `lenses:` are display-only like `declared:` and keep them (Bob's reading, named in the PR).
+# `lenses:` are a subset of what ran, so they refuse them too (no producer had one there).
 # Every stats.json carries tests.counting "passed" (Lenin's contract row, #4209 comment 7084777394).
 
 @test "v2: a listing family in runners dies, names its run twin, writes nothing" {
@@ -712,15 +712,18 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
   done
 }
 
-@test "v2: a listing family is still read in declared and in lenses" {
+@test "v2: a listing family is still read in declared, and refused in lenses" {
   export INPUT_RUNNERS="unit:vitest:$FIX/vitest-report.json"
   export INPUT_DECLARED="e2e:playwright:$FIX/playwright-list.txt"
-  export INPUT_LENSES="accessibility:bats:$FIX/bats-count.txt"
   run bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [ "$(jq '.tests.total' "$OUT")" -eq 85 ]
   [ "$(jq '.tests.declared.e2e' "$OUT")" -eq 197 ]
-  [ "$(jq '.tests.lenses.accessibility' "$OUT")" -eq 82 ]
+  rm -f "$OUT"
+  export INPUT_LENSES="accessibility:bats:$FIX/bats-count.txt"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]; [ ! -f "$OUT" ]
+  [[ "$output" == *"'bats' is a listing"*"bats-tap"* ]]
 }
 
 @test "v2: tests.counting is \"passed\", right after tests.total" {
