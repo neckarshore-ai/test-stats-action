@@ -98,6 +98,18 @@ runs:
         INPUT_TEST_RESULT: ${{ inputs.test_result }}
         INPUT_RED_DETAIL: ${{ inputs.red_detail }}
 
+    # Check (c), planning #4209 section 6: a test-runner invocation in this repo's workflows
+    # whose output is named in none of runners/declared/lenses. AFTER the emit on purpose:
+    # stats.json is already written, and in warn mode the script exits 0 on every path,
+    # so the check can never cost a producer its stats. Warn-only until the binding date.
+    - name: Check (c) - gated suites nobody configured
+      shell: bash
+      run: ${{ github.action_path }}/check-uncounted.sh
+      env:
+        INPUT_RUNNERS: ${{ inputs.runners }}
+        INPUT_DECLARED: ${{ inputs.declared }}
+        INPUT_LENSES: ${{ inputs.lenses }}
+
 branding:
   icon: 'check-circle'
   color: 'green'
