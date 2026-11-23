@@ -531,8 +531,10 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
 # Fixtures captured with bats 1.14.0 `--formatter tap -T` on 2026-11-23: this repo's own suite at
 # 0c03741 (58 of 58; a public repo, so no private suite's test names; test 57's name carries
 # "# skip"), three small suites for skip, fail and a run that died part-way (bats: "Executed 2
-# instead of expected 3 tests"), and Lenin's names suite in three formats. Counted = `ok N` lines
-# that end in the timing ` in Nms`. Red = any `not ok`, or executed (ok + not ok) != the plan `1..N`.
+# instead of expected 3 tests"), Lenin's names suite timed and untimed, his row-7 skip and a
+# --report-formatter stream. Counted = `ok N` lines that end in the timing ` in Nms`; a skip carries
+# ` in Nms # skip`; a line that is both, or neither, refuses the run. Red = any `not ok`, or
+# executed (ok + not ok) != the plan `1..N`.
 
 @test "bats-tap counts every ok line of a real run of this repo's suite (58, one name carries # skip)" {
   export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/test-stats-action-main.tap"
@@ -602,11 +604,21 @@ unit:tsx:$FIX/goldoni/search-index-data.out"
   [ "$(jq -r '.red' "$OUT")" = "false" ]
 }
 
-@test "bats-tap: the same suite through --report-formatter tap -T (timing on passes only) counts the same" {
-  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/names-timed-report.tap"
+@test "fail-closed: a --report-formatter tap stream is refused, and the message names it (Lenin's re-read, finding 2)" {
+  # bats-format-tap writes ` # in N ms` and no timing on a skip, so a name carrying `# skip`
+  # is ambiguous there again; only the timed `--formatter tap -T` stream is read
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/green-report.tap"
   run bash "$SCRIPT"
-  [ "$status" -eq 0 ]
-  [ "$(jq '.tests.byType.unit' "$OUT")" -eq 2 ]
+  [ "$status" -ne 0 ]; [ ! -f "$OUT" ]
+  [[ "$output" == *"--report-formatter"* ]]
+}
+
+@test "fail-closed: a line that reads as a pass and as a skip is refused, never counted (Lenin's row 7)" {
+  # `skip "waits in 5ms"` prints `ok 2 … in 1ms # skip waits in 5ms`: it ends in a timing
+  export INPUT_RUNNERS="unit:bats-tap:$FIX/bats-tap/skip-timing-reason.tap"
+  run bash "$SCRIPT"
+  [ "$status" -ne 0 ]; [ ! -f "$OUT" ]
+  [[ "$output" == *"ambiguous"*"ok 2"* ]]
 }
 
 @test "fail-closed: bats-tap without --timing exits non-zero, writes nothing (a pass and a skip read alike)" {

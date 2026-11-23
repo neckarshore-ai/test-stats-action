@@ -172,8 +172,8 @@ count_for() {
       count="$(trim "$(cat "$path")")"
       ;;
     bats-tap)
-      # The gated bats run's OWN TAP stream (`bats --formatter tap`, or `--report-formatter tap`
-      # for a report file beside the pretty output). planning #4209 step 1: the count comes from
+      # The gated bats run's OWN timed TAP stream (`bats --formatter tap -T > r.tap`; not a
+      # --report-formatter file, see below). planning #4209 step 1: the count comes from
       # the run that the gate executed, never from `bats --count` (a listing, see `bats` above).
       #
       # Shape (bats 1.14.0, fixtures in tests/fixtures/bats-tap/): a plan line `1..N` first, then
@@ -182,16 +182,16 @@ count_for() {
       # `not ok` are results, so an "ok" quoted inside a comment line is not one.
       # bats does not escape `#` in a test name, so without timing a passing test named
       # `x # skip y` and a test `x` skipped for `y` print the same line (Lenin on #15; bats'
-      # own junit report formatter miscounts that pair as well). With --timing (-T) a pass ends
-      # in ` in Nms`: `--formatter tap` puts the timing before a skip directive, and
-      # `--report-formatter tap` prints none on a skip. So the run must be timed:
-      #   counted = ok lines that end in ` in Nms` (an ok line that ends otherwise is a skip)
-      #   refused = an ok line that ends neither in ` in Nms` nor carries `# skip`, or no result
-      #             line carries a timing at all: the run was not timed. One shape stays ambiguous: a skip reason that itself ends in
-      #             ` in Nms` reads as a pass.
-      #   red     = any `not ok`, OR ok + not ok != N: a run that died part-way prints fewer
-      #             result lines than its plan and may print no `not ok` at all
-      #             (bats: "Executed 2 instead of expected 3 tests").
+      # pretty and junit formatters miscount that pair as well). Only the timed stream of
+      # `bats --formatter tap -T` is read: there bats prints the runner's timing right after the
+      # name (bats-exec-test, the same in 1.10.0 to 1.14.0), so per ok line
+      #   pass    = ends in ` in Nms`                       (counted)
+      #   skip    = carries ` in Nms # skip` and does not end in ` in Nms`
+      #   refused = both (a skip reason that itself ends in a timing, Lenin's row 7, or a name
+      #             carrying ` in Nms # skip`): a wrong number with no flag is the one thing
+      #             this emitter must not produce, so the run is refused and the line named
+      #   refused = neither: the run was not timed, or a --report-formatter on the same call
+      #             moved the stream off the timed path (bats-format-tap writes ` # in N ms`)
       # No plan line is a refusal: without it a truncated stream cannot be told from a whole one.
       local bt_plan bt_ok bt_skip bt_notok
       bt_plan="$(grep -m1 -oE '^1\.\.[0-9]+' "$path" | cut -d. -f3)"
@@ -199,15 +199,20 @@ count_for() {
         || die "runner 'bats-tap': no TAP plan line '1..N' in $path — is this really \`bats --formatter tap\` output? (a \`bats --count\` integer is a listing and belongs to the \`bats\` family)"
       bt_ok="$(grep -cE '^ok[[:space:]]' "$path" || true)"
       bt_notok="$(grep -cE '^not ok[[:space:]]' "$path" || true)"
-      local bt_pass bt_bare bt_timed
-      bt_pass="$(grep -E '^ok[[:space:]]' "$path" | grep -cE '[[:space:]]in [0-9]+ms[[:space:]]*$' || true)"
-      bt_bare="$(grep -E '^ok[[:space:]]' "$path" | grep -vE '[[:space:]]in [0-9]+ms[[:space:]]*$' | grep -cviE '#[[:space:]]*skip' || true)"
-      # a timed run carries a timing on at least one result line; a run where none does was not
-      # timed, even when every line carries `# skip` (an all-skipped timed report-formatter run
-      # reads the same and is refused too: it would count 0 either way)
-      bt_timed="$(grep -E '^(not )?ok[[:space:]]' "$path" | grep -cE '[[:space:]]in [0-9]+ ?ms' || true)"
-      if [ "$bt_bare" -ne 0 ] || { [ "$bt_timed" -eq 0 ] && [ "$((bt_ok + bt_notok))" -gt 0 ]; }; then
-        die "runner 'bats-tap': the run in $path is not timed (${bt_bare} ok line(s) with neither a timing nor a skip, ${bt_timed} result line(s) with a timing) — run bats with --timing (-T): bats does not escape '#' in a test name, so without it a passing test whose name carries '# skip' and a skipped test read alike"
+      local bt_cls bt_pass bt_both bt_none
+      bt_cls="$(grep -E '^ok[[:space:]]' "$path" | awk '
+        { p = ($0 ~ /[[:space:]]in [0-9]+ms[[:space:]]*$/)
+          k = (tolower($0) ~ /[[:space:]]in [0-9]+ms[[:space:]]+#[[:space:]]*skip([[:space:]]|$)/)
+          if (p && k) { b++; if (fb == "") fb = $0 } else if (p) n++; else if (!k) { z++; if (fz == "") fz = $0 } }
+        END { printf "%d %d %d\037%s\037%s\n", n, b, z, fb, fz }')"
+      local bt_counts bt_fb bt_fz
+      IFS=$'\037' read -r bt_counts bt_fb bt_fz <<<"$bt_cls"
+      read -r bt_pass bt_both bt_none <<<"$bt_counts"
+      if [ "$bt_both" -gt 0 ]; then
+        die "runner 'bats-tap': ${bt_both} ok line(s) in $path are ambiguous, a pass and a skip at once (a skip reason that ends in a timing, or a test name that carries ' in Nms # skip'); first: '${bt_fb}'. Reword that skip reason or name"
+      fi
+      if [ "$bt_none" -gt 0 ]; then
+        die "runner 'bats-tap': ${bt_none} ok line(s) in $path carry no timing of the form ' in Nms' (first: '${bt_fz}') — run bats with --formatter tap -T (--timing), and without --report-formatter on the same call, which moves the stream off the timed path: bats does not escape '#' in a test name, so only the timed stream tells a pass from a skip"
       fi
       bt_skip="$((bt_ok - bt_pass))"
       if [ "$bt_notok" -gt 0 ]; then
