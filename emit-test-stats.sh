@@ -206,8 +206,9 @@ count_for() {
       # timed, even when every line carries `# skip` (an all-skipped timed report-formatter run
       # reads the same and is refused too: it would count 0 either way)
       bt_timed="$(grep -E '^(not )?ok[[:space:]]' "$path" | grep -cE '[[:space:]]in [0-9]+ ?ms' || true)"
-      [ "$bt_bare" -eq 0 ] && { [ "$bt_timed" -gt 0 ] || [ "$((bt_ok + bt_notok))" -eq 0 ]; } \
-        || die "runner 'bats-tap': the run in $path is not timed (${bt_bare} ok line(s) with neither a timing nor a skip, ${bt_timed} result line(s) with a timing) — run bats with --timing (-T): bats does not escape '#' in a test name, so without it a passing test whose name carries '# skip' and a skipped test read alike"
+      if [ "$bt_bare" -ne 0 ] || { [ "$bt_timed" -eq 0 ] && [ "$((bt_ok + bt_notok))" -gt 0 ]; }; then
+        die "runner 'bats-tap': the run in $path is not timed (${bt_bare} ok line(s) with neither a timing nor a skip, ${bt_timed} result line(s) with a timing) — run bats with --timing (-T): bats does not escape '#' in a test name, so without it a passing test whose name carries '# skip' and a skipped test read alike"
+      fi
       bt_skip="$((bt_ok - bt_pass))"
       if [ "$bt_notok" -gt 0 ]; then
         note_red "bats-tap ($path): the run's own TAP stream has ${bt_notok} not ok (ok ${bt_ok}, of which skip ${bt_skip}; plan 1..${bt_plan})"
